@@ -1,0 +1,41 @@
+/* pages/uploadVideo/index.wxss */
+.chooseVideo {
+  text-align: center;
+  line-height: 100rpx;
+  height: 100rpx;
+  background-color: #bfa;
+}
+
+.box {
+  border: 1px solid red;
+  border-radius: 10rpx;
+  padding: 15rpx;
+}
+
+
+
+.input-item {
+  margin: 10rpx 0;
+  padding: 0 10rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  border-radius: 10rpx;
+  border: 2px solid #87a2b4;
+}
+
+
+label.required {
+  color: red;
+  margin-bottom: -15rpx;
+}
+
+.vshow {
+  margin: 20rpx;
+}
+
+.vshow video {
+  width: 100%;
+}

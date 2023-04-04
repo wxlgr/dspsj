@@ -1,0 +1,76 @@
+<view class="container">
+  <view class="avatar" bindtap="changeAvatar">
+    <image src="{{userInfo.avatarUrl||avatarDefault}}"></image>
+  </view>
+  <view class="nick-name single-line">{{userInfo.username}}</view>
+
+  <!-- 登录可见 -->
+  <block wx:if="{{logined}}">
+    <button id="uploadVideo" plain bindtap="goVideoUpload">上传作品</button>
+    <button id="logout" plain bindtap="logout">注销</button>
+    <view class="counts">
+      <span bindtap="fansHandle">{{myFansCount}} 粉丝</span>
+      <span bindtap="followHandle">{{myFollowCount}} 关注</span>
+      <span bindtap="getStarHandle">{{myStarCount}} 获赞</span>
+    </view>
+  </block>
+</view>
+
+<block wx:if="{{logined}}">
+  <!-- tabs -->
+  <view class="preference" wx:if="{{logined}}">
+    <view class="tabs" bindtap="cilckTab">
+      <view class="work {{activeTabIndex==0?'active':''}}" id="work">作品</view>
+      <view class="like {{activeTabIndex==1?'active':''}}" id="like">喜欢</view>
+      <view class="collection {{activeTabIndex==2?'active':''}}" id="collection">收藏</view>
+    </view>
+  </view>
+  <!-- tab content -->
+  <view class="content">
+    <!-- 作品 -->
+    <block wx:if="{{activeTabIndex==0}}">
+      <view class="myworks">
+        <block wx:if="{{myworks.length}}">
+          <block wx:key="item" wx:for="{{myworks}}">
+            <view class="Itembox">
+              <view class="text">作品{{index+1}} : {{'《'}} {{item.title}} {{'》'}}
+              </view>
+              <view class="deleteBtn" data-work-index="{{index}}" data-work-item="{{item}}" bindtap="deleteMyWork">删除</view>
+            </view>
+          </block>
+        </block>
+        <block wx:else>
+          <view>暂无作品,快去上传吧~</view>
+        </block>
+
+      </view>
+    </block>
+    <!-- 喜欢 -->
+    <block wx:if="{{activeTabIndex==1}}">
+      <view class="mylikes">
+        <block wx:if="{{mylikeVideos.length}}">
+          <view class="Item" wx:for="{{mylikeVideos}}" wx:key="item">
+            喜欢{{index+1}} : {{item.author}} 的{{'《'}} {{item.title}} {{'》'}}
+          </view>
+        </block>
+        <block wx:else>
+          <view>暂无喜欢,快去浏览添加吧~</view>
+        </block>
+      </view>
+    </block>
+    <!-- 收藏 -->
+    <block wx:if="{{activeTabIndex==2}}">
+      <view class="mycollections">
+        <block wx:if="{{mycollectVideos.length}}">
+          <view class="Item" wx:for="{{mycollectVideos}}" wx:key="item">
+            收藏{{index+1}} : {{item.author}} 的{{'《'}} {{item.title}} {{'》'}}
+          </view>
+        </block>
+        <block wx:else>
+          <view>暂无收藏,快去浏览添加吧~</view>
+        </block>
+      </view>
+    </block>
+
+  </view>
+</block>
