@@ -12,15 +12,9 @@ git init
 
    
 
-
-
 # 二 、安装依赖
-> 一定按顺序
-
+>这里因为镜像原因，一定使用cnpm
+>npm install -g cnpm --registry=https://registry.npmmirror.com
 ```js
-npm i express mongoose dotenv jsonwebtoken colors
-npm install canvas --no-save --canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas/
-npm install gl  --no-save --gl_binary_host_mirror=https://registry.npmmirror.com/-/binary/gl
-npm install ffcreator
+cnpm i
 ```
-

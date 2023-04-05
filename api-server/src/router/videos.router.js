@@ -184,22 +184,22 @@ videosRouter.post('/delete', async (req, res) => {
 
   videosModel.findByIdAndDelete(
     _id
-    ).then(video => {
-      res.send({
-        code: 0,
-        msg: "视频删除成功",
-        result: {
-          deleteVideo: video
-        }
-      })
-
-    }).catch(err => {
-      res.send({
-        code: 1,
-        msg: "视频不存在,删除失败",
-        result: null
-      })
+  ).then(video => {
+    res.send({
+      code: 0,
+      msg: "视频删除成功",
+      result: {
+        deleteVideo: video
+      }
     })
+
+  }).catch(err => {
+    res.send({
+      code: 1,
+      msg: "视频不存在,删除失败",
+      result: null
+    })
+  })
 })
 
 
