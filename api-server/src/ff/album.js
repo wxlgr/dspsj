@@ -1,4 +1,4 @@
-const path = require('path');
+
 const ffConfig = require('./ff.config')
 const colors = require('colors')
 const { FFScene, FFAlbum, FFText, FFCreator } = require('ffcreator');
@@ -7,24 +7,40 @@ const { FFScene, FFAlbum, FFText, FFCreator } = require('ffcreator');
 const { width, height } = ffConfig
 
 // 创建一个制作相册集视频的任务
-const createAlbumFFTask = function ({
-  imgs = [],
-  imgDuration = 4,
-  transitionTime = 3,
-  // 马尔斯绿
-  bgColor = '#01847f',
-  bgm = './assets/bgm/乌云 - 董唧唧.mp3',
-  txt = {}
-}
-) {
+const createAlbumFFTask = function (
+  options = {
+    imgs: [],
+    bgm: '',
+    imgDuration: 4,
+    transitionTime: 3,
+    // 马尔斯绿
+    bgColor: '#01847f',
+    txt: {
+      title: 'FFCreator 图集',
+      color: 'gold',
+      bgColor: 'transparent',
+      fontSize: 30
+    }
+  }) {
 
-  // 合并文字配置
-  txt = Object.assign({
+  options = Object.assign({
+    imgDuration: 4,
+    transitionTime: 3,
+    // 马尔斯绿
+    bgColor: '#01847f',
+  }, options)
+
+  options.txt = Object.assign({
     title: 'FFCreator 图集',
     color: 'gold',
     bgColor: 'transparent',
     fontSize: 24
-  }, txt)
+  }, options.txt)
+
+
+  console.log(options)
+
+  const { imgs, bgm, imgDuration, transitionTime, bgColor, txt } = options
 
 
   const creator = new FFCreator(ffConfig)
@@ -46,12 +62,12 @@ const createAlbumFFTask = function ({
     showCover: true
   });
   album.setTransition('random');      // 设置相册切换动画,默认就是随机
-
   album.setTransTime(transitionTime);             // 设置单张停留时长
   album.setDuration(imgDuration)
+
+
   scene.addChild(album);
   scene.setDuration(album.getTotalDuration() + 1)
-
 
   // 音频
   scene.addAudio({
@@ -72,11 +88,7 @@ const createAlbumFFTask = function ({
   });
   fftext.addEffect('fadeInDown', 2, 1);         // 动画
   fftext.alignCenter(); // 文字居中
-  fftext.setStyle({ padding: [6, 12] });   // 设置样式object
-
-  console.log(txt);
-
-
+  fftext.setStyle({ padding: [6] });   // 设置样式object
 
   scene.addChild(fftext);
   creator.addChild(scene);
@@ -99,4 +111,4 @@ const createAlbumFFTask = function ({
 
 
 
-module.exports = {createAlbumFFTask}
+module.exports = { createAlbumFFTask }

@@ -17,74 +17,55 @@ userRouter.post('/register', async function (req, res) {
         })
     }
     // 初次注册
-    usersModel.create(req.body).then(data => {
-        res.send({
-            code: 0,
-            result: data,
-            msg: '注册成功'
-        })
-    }).catch(err => {
-        res.send({
-            code: 1,
-            result: null,
-            msg: err.message
-        })
-    });
+    const user = await usersModel.create(req.body)
+    res.send({
+        code: 0,
+        result: user,
+        msg: '注册成功'
+    })
 })
 
 // 登录
 userRouter.post('/login', async function (req, res) {
     let { username = '', nickname = '', password } = req.body
 
-    usersModel.findOne({
+    const user = usersModel.findOne({
         // 通过用户名或者昵称
         $or: [{ username }, { nickname }],
         password: password
-    }).then(data => {
-        if (data) {
-            // 登录成功，返回token
-
-            const token = 'Bearer ' + jwt.sign({
-                data: { username, password }
-            }, 'key', { expiresIn: '1h' })
-            res.send({
-                code: 0,
-                token,
-                result: data,
-                msg: '登录成功'
-            })
-        } else {
-            // 登录失败
-            res.send({
-                code: 1,
-                result: data,
-                msg: '登录失败'
-            })
-        }
-
     })
+    if (user) {
+        // 登录成功，返回token
+        const token = 'Bearer ' + jwt.sign({
+            data: { username, password }
+        }, 'key', { expiresIn: '1h' })
+        res.send({
+            code: 0,
+            token,
+            result: data,
+            msg: '登录成功'
+        })
+    } else {
+        // 登录失败
+        res.send({
+            code: 1,
+            result: data,
+            msg: '登录失败'
+        })
+    }
 })
 
 
-// 查询用户信息
+// 根据Id查询用户信息
 userRouter.get('/findById', async function (req, res) {
 
     // 用户id
-    let _id = req.body._id
-    usersModel.findById(_id).then(data => {
-        if (data) {
-            res.send({
-                code: 0,
-                result: data,
-                msg: '查询成功'
-            })
-        } else {
-            res.send({
-                code: 1,
-                result: null,
-                msg: '查询失败'
-            })
-        }
+    let _id = req.query._id
+    const user = usersModel.findById(_id)
+    res.send({
+        code: 0,
+        result: user,
+        msg: '查询完成'
     })
 })
 
@@ -128,21 +109,11 @@ userRouter.post('/delete', async (req, res) => {
     // 用户id
     const _id = req.body._id
 
-    usersModel.findByIdAndDelete(_id).then(data => {
-        if (data) {
-            res.send({
-                code: 0,
-                result: data,
-                msg: '删除成功'
-            })
-        } else {
-            res.send({
-                code: 1,
-                result: data,
-                msg: '删除失败'
-            })
-        }
-
+    const user = await usersModel.findByIdAndDelete(_id)
+    res.send({
+        code: 0,
+        result: user,
+        msg: user ? '删除成功' : '用户不存在，删除失败'
     })
 })
 

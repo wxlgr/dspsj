@@ -4,11 +4,16 @@ function linkUrls(...urls) {
 
 /**
  * 
- * @param {Number} n default9 几位数
+ * @param {Number} n default:8 几位数
  * @returns 返回n位数的随机数字
  */
-function uniqueSuffix(n = 9) {
-    return '' + Math.round(Math.random() * 10 ** n)
+function uniqueSuffix(n =8) {
+    let str =''+ Math.round(Math.random() * (10 ** n))
+    // 确保位数
+    while(str.length!==n){
+        str =''+ Math.round(Math.random() * (10 ** n))
+    }
+    return str
 }
 
 
@@ -23,6 +28,7 @@ function removeFile(fpath) {
     }
 
 }
+
 
 
 module.exports = {

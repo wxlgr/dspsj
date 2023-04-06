@@ -1,12 +1,14 @@
 const { Router } = require("express");
 const router = new Router();
-const userRouter = require('./users.router')
-const videoRouter = require('./videos.router')
-const uploadRouter = require('./upload.router')
+const usersRouter = require('./users.router')
+const videosRouter = require('./videos.router')
+const uploadsRouter = require('./uploads.router')
+const bgmsRouter = require('./bgms.router')
 
-router.use('/users',userRouter)
-router.use('/videos',videoRouter)
-router.use('/upload',uploadRouter)
+router.use('/users', usersRouter)
+router.use('/videos', videosRouter)
+router.use('/upload', uploadsRouter)
+router.use('/bgms', bgmsRouter)
 
 
 module.exports = router

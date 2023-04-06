@@ -1,10 +1,10 @@
 const { model } = require("mongoose");
-const { commentSchema, userSchema, videoSchema, bgm } = require('../schemas/index')
+const { commentSchema, userSchema, videoSchema, bgmSchema } = require('../schemas/index')
 
 const usersModel = model('User', userSchema, 'users')
 const videosModel = model('Video', videoSchema, 'videos')
 const commentsModel = model('Comment', commentSchema, 'comments')
-const bgmsModel = model('Bgm', commentSchema, 'bgms')
+const bgmsModel = model('Bgm', bgmSchema, 'bgms')
 
 
 

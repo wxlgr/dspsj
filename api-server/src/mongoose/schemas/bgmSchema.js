@@ -1,15 +1,15 @@
 const mongoose = require('../mongoose');
-
+const userSchema = require('./userSchema')
 
 // 用户数据库模型
 let bgmSchema = new mongoose.Schema({
     // 作者
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User', 
     },
     // 名称
-    name: {
+    title: {
         type: String,
         required: true
     },
@@ -19,6 +19,8 @@ let bgmSchema = new mongoose.Schema({
         required: true
     },
 
+    // 是否公开
+    isPublic: { type: Boolean, default: true }
 
 }, { timestamps: true }
 )

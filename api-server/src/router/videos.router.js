@@ -1,42 +1,24 @@
 const videosRouter = new require('express').Router()
 
-const { videosModel, usersModel } = require('../mongoose/models/index')
-const { createBlurFFTask } = require('../ff/blur')
+const { videosModel } = require('../mongoose/models/index')
+const { createVideoGgmFFTask } = require('../ff/videoBgm')
 const { createAlbumFFTask } = require('../ff/album')
 const { startFFTask, FFCreatorCenter } = require('../ff/index')
 const path = require('path')
-const bgms = require('./data/bgmUrls')
 
 
-const { STATIC_PATH } = require('../config/app.config')
+const { baseUrl } = require('../config/app.config')
 
-const ffoutPath = STATIC_PATH + '/ffout/'
+const ffoutPath = baseUrl + '/static/ffout/'
 
 // 视频加工
-videosRouter.post('/processing', async (req, res) => {
+videosRouter.post('/makeVideo', async (req, res) => {
 
-  let { uid, bgmUrl, videoUrl, blur = 0 } = req.body
+  const { videoUrl, bgmUrl } = req.body
 
-
-  if (!bgmUrl) {
-    // 可选的随机bgm
-    let randomIndex = Math.floor(Math.random() * bgms.length)
-    bgmUrl = bgms[randomIndex].bgmUrl
-  }
-
-  // res.send({
-  //   code: 0,
-  //   msg: "加工完成",
-  //   // 
-  //   bgm: bgmUrl,
-  //   videoUrl
-  // })
-
-  const taskId = startFFTask(() => createBlurFFTask({
+  const taskId = startFFTask(() => createVideoGgmFFTask({
     videoPath: videoUrl,
-    bgm: bgmUrl,
-    // 模糊度
-    blur
+    bgmPath: bgmUrl
   }))
 
   FFCreatorCenter.onTaskComplete(taskId, result => {
@@ -44,10 +26,8 @@ videosRouter.post('/processing', async (req, res) => {
     res.send({
       code: 0,
       msg: "视频加工完成",
-      uid,
       result: ffFileUrl
     })
-
 
   });
 
@@ -63,35 +43,30 @@ videosRouter.post('/processing', async (req, res) => {
 })
 
 // 制作图册
-videosRouter.post('/makeAlums', async (req, res) => {
+videosRouter.post('/makeAlbums', async (req, res) => {
 
 
-  const photoUrls = JSON.parse(req.body.photoUrls)
+  let { videoUrl, photoUrls } = req.body
 
-  let { uid, bgmUrl, bgColor, textTitle, textColor, textFontSize, textBgColor } = req.body
+  photoUrls = JSON.parse(photoUrls)
 
-  if (!bgmUrl) {
-    // 可选的随机bgm
-    let randomIndex = Math.floor(Math.random() * bgms.length)
-    bgmUrl = bgms[randomIndex].bgmUrl
-  }
-
-
-  // 有值的属性才会保留
-  let txt = JSON.stringify({
-    title: textTitle,
-    color: textColor,
-    fontSize: textFontSize * 1,
-    bgColor: textBgColor,
-  })
-  txt = JSON.parse(txt)
-
+  // res.send({
+  //   code: 0,
+  //   msg: "制作图册开始",
+  //   result: {
+  //     imgs: photoUrls,
+  //     video: videoUrl
+  //   }
+  // })
 
   const taskId = startFFTask(() => createAlbumFFTask({
     imgs: photoUrls,
-    bgm: bgmUrl,
-    bgColor,
-    txt
+    video: videoUrl,
+    // txt: {
+    //   title: '测试',
+    //   color: 'yellow',
+    //   fontSize:28
+    // },
   }))
 
   FFCreatorCenter.onTaskComplete(taskId, result => {
@@ -99,8 +74,7 @@ videosRouter.post('/makeAlums', async (req, res) => {
     res.send({
       code: 0,
       msg: "制作图册完成",
-      uid,
-      result: ffFileUrl
+      result: ffFileUrl,
     })
   });
 
@@ -118,59 +92,39 @@ videosRouter.post('/makeAlums', async (req, res) => {
 // 视频新增
 videosRouter.post('/add', async (req, res) => {
 
-  const { title = '', author = '', videoUrl = '', desc = '' } = req.body
-
-
-
-  videosModel.create({
-    title,
-    author,
-    videoUrl,
-    desc
-  }).then(video => {
-    res.send({
-      code: 0,
-      msg: "视频新增成功",
-      result: video
-    })
-  }).catch(error => {
-    res.send({
-      code: 1,
-      msg: error.message,
-      result: null
-    })
+  const newVideoObj = req.body
+  const video = await videosModel.create(newVideoObj)
+  res.send({
+    code: 0,
+    msg: "新增成功",
+    result: video
   })
-
 })
+
 
 
 // 视频修改
 videosRouter.post('/update', async (req, res) => {
 
   // 新的视频信息对象
-  let newVideoInfo = req.body
+  let updateVideoObj = req.body
   // 视频id
   let _id = req.body._id
 
-
-
-  videosModel.findByIdAndUpdate({
-    _id
-  }, newVideoInfo, {
-    returnDocument: 'after'
-  }).then(video => {
+  const video = await videosModel.findByIdAndUpdate(_id, updateVideoObj, { returnDocument: 'after' })
+  if (video) {
     res.send({
       code: 0,
       msg: "视频修改成功",
       result: video
     })
-  }).catch(error => {
+  } else {
     res.send({
       code: 1,
-      msg: error.message,
+      msg: "视频不存在,修改失败",
       result: null
     })
-  })
+  }
 
 })
 
@@ -180,28 +134,85 @@ videosRouter.post('/delete', async (req, res) => {
   // 视频id
   let _id = req.body._id
 
-
-
-  videosModel.findByIdAndDelete(
-    _id
-  ).then(video => {
-    res.send({
-      code: 0,
-      msg: "视频删除成功",
-      result: {
-        deleteVideo: video
-      }
-    })
-
-  }).catch(err => {
-    res.send({
-      code: 1,
-      msg: "视频不存在,删除失败",
-      result: null
-    })
+  const video = await videosModel.findByIdAndDelete(_id)
+  res.send({
+    code: 0,
+    result: video,
+    msg: video ? '删除成功' : '视频不存在，删除失败'
   })
 })
 
+
+// 查找所有 并填充 author：根据uid返回具体User 要select username，不要_id
+videosRouter.get('/findAll', async function (req, res) {
+  const videos = await videosModel.find().populate('author', 'username -_id')
+  res.send({
+    code: 0,
+    result: {
+      videos,
+      totalCount: videos.length
+    },
+    msg: '查询成功'
+  })
+})
+
+
+// video分页查询
+videosRouter.get('/findByPage', async function (req, res) {
+
+  let { pageIndex = 1, pageSize = 5 } = req.query
+
+  // 转为数字
+  pageIndex = +pageIndex
+  pageSize *= 1
+
+  const totalCount = await videosModel.count()
+  const list = await videosModel.find().skip((pageIndex - 1) * pageSize)
+    .limit(pageSize)
+
+  res.send({
+    code: 0,
+    result: {
+      // 总数
+      totalCount,
+      // 总页数
+      totolSize: Math.ceil(totalCount / pageSize),
+      // 当前返回列表项数目
+      listCount: list.length,
+      // 第几页
+      pageIndex,
+      // 每页显示条数
+      pageSize,
+      // 列表数据
+      list: list,
+    },
+    msg: '查询成功'
+  })
+})
+
+// video修改
+
+videosRouter.post('/update', async function (req, res) {
+  const videoObj = req.body
+  const _id = req.body._id
+
+  // 返回修改之后的文档
+  const video = await videosModel.findByIdAndUpdate(_id, videoObj, { returnDocument: 'after' })
+
+  if (video) {
+    res.send({
+      code: 0,
+      msg: "video修改成功",
+      result: video
+    })
+  } else {
+    res.send({
+      code: 1,
+      msg: "video不存在,修改失败",
+      result: null
+    })
+  }
+})
 
 
 

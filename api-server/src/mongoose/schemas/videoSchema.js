@@ -11,7 +11,7 @@ const videoSchema = new mongoose.Schema({
 
     // 可见权限
     // 默认私密
-    visible: { type: Boolean, default: 'private' },
+    isPublic: { type: Boolean, default: false },
 
     //链接
     videoUrl: { type: String, default: '' },

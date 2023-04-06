@@ -7,12 +7,10 @@ const ffConfig = {
     outputDir,                // 输出目录
     width: 500,               // 影片宽
     height: 680,              // 影片高
-    // cover: './assets/imgs/cover/cover1.jpg',           // 设置封面
     audioLoop: true,          // 音乐循环
     threads: 8,               // 多线程(伪造)并行渲染
-    debug: false,             // 开启测试模式
-    render:'gl'
+    render:'gl',
+    
 }
-
 
 module.exports = ffConfig

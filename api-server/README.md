@@ -13,8 +13,10 @@ git init
    
 
 # 二 、安装依赖
->这里因为镜像原因，一定使用cnpm
->npm install -g cnpm --registry=https://registry.npmmirror.com
 ```js
 cnpm i
-```
+npm install canvas --canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas/ --no-save
+npm install gl --gl_binary_host_mirror=https://registry.npmmirror.com/-/binary/gl --no-save
+npm i ffcreator --no-save
+
+
