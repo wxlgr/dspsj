@@ -46,22 +46,15 @@ videosRouter.post('/makeVideo', async (req, res) => {
 videosRouter.post('/makeAlbums', async (req, res) => {
 
 
-  let { videoUrl, photoUrls } = req.body
+  let { bgmUrl, photoUrls } = req.body
 
   photoUrls = JSON.parse(photoUrls)
 
-  // res.send({
-  //   code: 0,
-  //   msg: "制作图册开始",
-  //   result: {
-  //     imgs: photoUrls,
-  //     video: videoUrl
-  //   }
-  // })
+
 
   const taskId = startFFTask(() => createAlbumFFTask({
     imgs: photoUrls,
-    video: videoUrl,
+    bgm: bgmUrl,
     // txt: {
     //   title: '测试',
     //   color: 'yellow',

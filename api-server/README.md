@@ -8,15 +8,16 @@ git init
 
    ```js
    node_modules
+   static/ffout
+   static/uploads
    ```
 
    
 
 # 二 、安装依赖
+> 由于镜像原因，这里安装ffcreator必须使用cnpm，已配置可以忽略安装cnpm
+>
+> `npm install -g cnpm --registry=https://registry.npmmirror.com`
+
 ```js
 cnpm i
-npm install canvas --canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas/ --no-save
-npm install gl --gl_binary_host_mirror=https://registry.npmmirror.com/-/binary/gl --no-save
-npm i ffcreator --no-save
-
-

@@ -34,7 +34,7 @@ const createAlbumFFTask = function (
     title: 'FFCreator 图集',
     color: 'gold',
     bgColor: 'transparent',
-    fontSize: 24
+    fontSize: 30
   }, options.txt)
 
 
