@@ -33,12 +33,7 @@ const createAlbumFFTask = function ({
   const scene = new FFScene();
   scene.setBgColor(bgColor);
 
-  // 测试数据
-  // if (imgs.length == 0) {
-  //   for (let i = 1; i <= 6; i++) {
-  //     imgs.push(path.join(__dirname, `./assets/imgs/album/0${i}.jpeg`));
-  //   }
-  // }
+
 
   // 图集
 
