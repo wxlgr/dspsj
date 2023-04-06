@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 
+const {port}  = require('./src/config/app.config')
 const path = require('path')
 
 // 解析body
@@ -28,6 +29,9 @@ app.use('*', (req, res) => {
 
 
 // 监听3000端口
-app.listen(3000, () => {
-  console.log(`api-server listening at http://localhost:3000`)
+app.listen(port, () => {
+  console.log(`api-server listening at http://localhost:${port}`)
 })
+
+
+

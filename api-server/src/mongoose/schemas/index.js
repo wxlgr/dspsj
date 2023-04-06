@@ -1,9 +1,10 @@
 const commentSchema = require('./commentSchema');
 const userSchema = require('./userSchema');
 const videoSchema = require('./videoSchema');
-const mongoose =require('../mongoose');
+const bgmSchema = require('./bgmSchema');
 module.exports = {
     commentSchema,
     userSchema,
-    videoSchema
+    videoSchema,
+    bgmSchema
 }
