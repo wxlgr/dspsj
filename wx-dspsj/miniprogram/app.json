@@ -4,27 +4,30 @@
     "pages/index/index",
     "pages/mine/index",
     "pages/regist/index",
-    "pages/uploadVideo/index"
+    "pages/uploadVideo/index",
+    "pages/playVideo/index"
   ],
   "window": {
-    "backgroundColor": "#fff",
-    "backgroundTextStyle": "light",
+    "backgroundColor": "#f5f5f5",
+    "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
+    "selectedColor": "#ff6700",
+    "backgroundColor": "#f5f5f5",
     "list": [
       {
         "pagePath": "pages/index/index",
         "text": "视频",
-        "iconPath": "./images/unselected/video.png",
-        "selectedIconPath": "./images/selected/video.png"
+        "iconPath": "./assets/images/unselected/video.png",
+        "selectedIconPath": "./assets/images/selected/video.png"
       },
       {
         "pagePath": "pages/mine/index",
         "text": "我的",
-        "iconPath": "./images/unselected/user.png",
-        "selectedIconPath": "./images/selected/user.png"
+        "iconPath": "./assets/images/unselected/user.png",
+        "selectedIconPath": "./assets/images/selected/user.png"
       }
     ]
   },

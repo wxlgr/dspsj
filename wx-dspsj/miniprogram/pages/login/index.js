@@ -1,6 +1,6 @@
 // 登陆页
 import md5 from 'md5'
-import apiUrls from '../../apiUrls/index'
+import api from '../../api/index'
 Page({
   data: {},
   // 加载时
@@ -29,58 +29,38 @@ Page({
     })
 
   },
-  login(userObj) {
-    let that = this
-    // 显示进度条
-    wx.showLoading({
-      title: '请等待……',
-    });
-    wx.request({
-      url: apiUrls.login,
-      method: 'POST',
-      data: userObj,
-      success({
-        data
-      }) {
-        console.log(data)
-        let {
-          token
-        } = data
-        if (token) {
-          //登录成功
-          //记录用户信息
-          const {
-            _id,
-            username,
-            nickname = '',
-            avatarUrl = ''
-          } = data.result;
-          //保存
-          wx.setStorageSync('token', token);
-          wx.setStorageSync('userInfo', {
-            _id,
-            username,
-            nickname,
-            avatarUrl
-          });
-          setTimeout(() => {
-            wx.reLaunch({
-              url: '../mine/index'
-            })
-          }, 1000)
-        }
-        wx.hideLoading()
-        wx.showToast({
-          title: data?.msg,
-          icon: token ? 'success' : 'error'
+  async login(userObj) {
+    const data = await api.login(userObj)
+    console.log(data)
+    let {
+      token
+    } = data
+    if (token) {
+      //登录成功
+      //记录用户信息
+      const {
+        _id,
+        username,
+        avatarPath
+      } = data.result;
+      //保存
+      getApp().globalData.logined = true
+      wx.setStorageSync('token', token);
+      wx.setStorageSync('userInfo', {
+        _id,
+        username,
+        avatarPath
+      });
+      setTimeout(() => {
+        wx.reLaunch({
+          url: '../index/index'
         })
-      },
-      fail(err) {
-        console.log(err);
-      }
+      }, 1000)
+    }
+    wx.showToast({
+      title: data?.msg,
+      icon: data.code === 0 ? 'success' : 'error'
     })
-
-
   },
 
   // 跳转到注册页事件

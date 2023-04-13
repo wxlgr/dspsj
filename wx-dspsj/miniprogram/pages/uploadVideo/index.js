@@ -1,94 +1,86 @@
-import apiUrls from '../../apiUrls/index'
+import api from '../../api/index'
+import {
+  checkAuth
+} from '../../utils/checkAuth'
 Page({
   data: {
-    userInfo: {},
+    uid: '',
     tempFilePath: '', //视频暂存地址
     size: '', //视频大小,
-    // 数据双向绑定
-    dataList: {
+    video: {
       vtitle: '',
-      vdesc: ''
+      vdesc: '',
+      isPublic: true
     }
   },
-  onLoad(params) {
+  async onLoad(params) {
+    if (!await checkAuth()) {
+      return wx.redirectTo({
+        url: '../login/index',
+      })
+    }
     this.setData({
-      userInfo: wx.getStorageSync('userInfo')
+      uid: getApp().uid
+    })
+  },
+  // title输入框失去焦点
+  titleBlur(e) {
+    this.setData({
+      'video.vtitle': ('' + e.detail.value).trim()
     })
   },
   //选择视频
-  chooseVideo() {
-    const that = this;
+  async chooseVideo() {
     // 选择视频
-    wx.chooseMedia({
-      mediaType: 'video',
-      count: 1,
-      success: chooseResult => {
-        const {
-          tempFilePath,
-          size
-        } = chooseResult.tempFiles[0]
-        console.log(chooseResult.tempFiles[0]);
-
-        that.setData({
-          tempFilePath,
-          size: (size / 1024 / 1024).toFixed(2) + "MB"
-        })
-      }
+    const chooseResult = await wx.chooseMedia({
+      mediaType: "video",
+      count: 1
+    })
+    const {
+      tempFilePath,
+      size
+    } = chooseResult.tempFiles[0]
+    this.setData({
+      tempFilePath,
+      size: (size / 1024 / 1024).toFixed(2) + "MB"
     })
   },
   //上传视频
-  doUploadVideo(event) {
-    const that = this;
-    // console.log(event);
+  async doUploadVideo(event) {
     const {
-      username,
-      _id
-    } = that.data.userInfo
-    const {tempFilePath} = this.data
+      tempFilePath,
+      uid
+    } = this.data
     let {
       vtitle,
-      vdesc
+      vdesc,
+      isPublic
     } = event.detail.value;
-    // console.log(event.detail);
-
-    // console.log(that.data);
-    vtitle = vtitle || Date.now(); //没有给名字就用时间戳
-    // wx.showLoading({
-    //   title: '上传中',
-    // })
-    wx.uploadFile({
-      url: apiUrls.uploadVideo,
-      filePath: tempFilePath, 
-      name: 'file',
-      formData: {
-        username,_id,vtitle
-      }, //上传额外携带的参数
-      success(f) {
-        // data传过来是string类型
-        const fileData = JSON.parse(f.data)
-       console.log(fileData);
-        wx.showToast({
-          title: '视频上传成功'
-        })
-        //数据库添加
-      }
+    // 上传视频
+    const {
+      result
+    } = await api.uploadFile(tempFilePath, 'video')
+    // 相对路径和访问地址，相对路径用于数据库存储
+    const {
+      path,
+      url
+    } = result
+    //数据库添加
+    const data = await api.addVideo({
+      title: vtitle,
+      desc: vdesc,
+      author: uid,
+      videoPath: path,
+      isPublic,
     })
-
-
-
-
+    if (data) {
+      wx.showToast({
+        title: '作品发布成功',
+      })
+      wx.switchTab({
+        url: '../mine/index',
+      })
+    }
   },
 
-
-  // bindInput
-  // 数据实现双向绑定
-  bindInput(e) {
-    // console.log(e);
-    let name = e.target.dataset.name
-    let key = 'dataList.' + name
-    let value = e.detail.value
-    this.setData({
-      [key]: value
-    })
-  }
 })

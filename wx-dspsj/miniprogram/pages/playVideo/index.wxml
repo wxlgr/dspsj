@@ -1,0 +1,15 @@
+<!--pages/playVideo/index.wxml-->
+<view class="container">
+  <view class="vtitle single-line">
+    {{video.title}}ssssssssssssssdsfsfsf</view>
+  <view class="vdesc three-line">
+    {{video.desc}} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus, facilis dolor earum modi iste eveniet ab repellat quas architecto at vero sed. Magni, nesciunt suscipit illum vero accusamus minima nostrum?</view>
+  <video id="video" src="{{videoUrl}}" enable-play-gesture object-fit="cover" />
+  <!-- 额外信息 -->
+  <view class="info">
+    <view class="type">type:{{videoInfo.type}}</view>
+    <view class="duration">duration:{{videoInfo.duration}}s</view>
+    <view class="fps">fps:{{videoInfo.fps}}</view>
+    <view class="size">size:{{videoInfo.size}}MB</view>
+  </view>
+</view>

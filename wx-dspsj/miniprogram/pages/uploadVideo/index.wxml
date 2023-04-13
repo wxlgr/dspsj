@@ -1,23 +1,32 @@
 <!--pages/uploadVideo/index.wxml-->
-<view class="chooseVideo">
-  <text class="box" bindtap="chooseVideo" wx:if="{{tempFilePath==''}}">选择你的视频</text>
-  <text class="box" bindtap="chooseVideo" wx:else>重选视频</text>
-</view>
-<form bindsubmit='doUploadVideo'>
-  <view class='input-item'>
-    <label class='required'>*</label>
-    <input bindinput="bindInput" data-name="vtitle"  type="text" name='vtitle' placeholder="给视频提个名呗~" value= "{{dataList.vtitle}}"/>
+<view class="container">
+  <view class="chooseVideo">
+    <text class="btn" bindtap="chooseVideo">{{tempFilePath==''?'选择你的视频':'重选视频'}}
+    </text>
   </view>
-  <view class='input-item'>
-    <input  bindinput="bindInput" data-name="vdesc" type="text" name='vdesc' placeholder="描述一下视频吧~" value="{{dataList.vdesc}}"/>
-  </view>
-  <button size="mini" type="default" form-type="submit" disabled="{{tempFilePath==''||dataList.vtitle==''}}">确定</button>
-  <button size="mini" type="default" bindtap="" disabled="{{tempFilePath==''||dataList.vtitle==''}}">加工</button>
-</form>
+  <form bindsubmit='doUploadVideo'>
+    <view class='input-item'>
+      <label class='required'><i>*</i>title:</label>
+      <input  type="text" name='vtitle' placeholder="给视频提个名呗~" />
+    </view>
+    <view class='input-item'>
+      <label>desc:</label>
+      <textarea auto-height name='vdesc' placeholder="描述一下视频吧~" />
+    </view>
+    <view class='input-item'>
+      <label>isPublic:</label>
+      <switch checked name='isPublic' />
+    </view>
+    <view class="btns">
+      <button size="mini" type="primary" form-type="submit" disabled="{{tempFilePath==''||vtitle==''}}">直接发布</button>
+      <button size="mini" type="primary" bindtap="" disabled="{{tempFilePath==''||vtitle==''}}">加工</button>
+    </view>
+  </form>
 
-<view class="vshow" wx:if="{{tempFilePath}}">
-  <video src="{{tempFilePath}}" object-fit="contain" enable-play-gesture></video>
-  <view>
-    视频大小：{{size}}
+  <view class="vshow" wx:if="{{tempFilePath}}">
+    <video src="{{tempFilePath}}" object-fit="cover" enable-play-gesture></video>
+    <view>
+      视频大小：{{size}}
+    </view>
   </view>
 </view>

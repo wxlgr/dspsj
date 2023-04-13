@@ -1,115 +1,178 @@
 page {
-  background-color: #fff;
+  /* background: -webkit-linear-gradient(-45deg, rgb(198, 222, 230), skyblue); */
   font-size: 14px;
 }
 
-.container {
-  margin: 0 auto;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-  background-color: #F5F5F5;
-  padding: 20rpx 0;
+/* 顶部展示用户的大盒子 */
+.user {
+  position: relative;
+  height: 140px;
+  /* background-color: red; */
 }
 
-.avatar {
-  width: 120rpx;
-  height: 120rpx;
+/*头像，nickname,id */
+.userInfo {
+  position: absolute;
+  left: 10px;
+  bottom: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.userInfo .avatar {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  border: 1px solid #ccc;
+  border: 2px solid #fff;
+  margin-right: 5px;
 }
 
-.avatar image {
-  width: 100%;
-  height: 100%;
+.userInfo .uid {
+  color: #555;
+  font-size: 10px;
+  width: 200px;
 }
 
 .nick-name {
-  margin: 10rpx 0;
-  width: 240rpx;
-  text-align: center;
-  color: #000;
-  font-weight: 600;
-}
-
-#uploadVideo {
-  width: 160rpx;
-  border: 1px solid #ccc;
-  font-size: 24rpx;
-  padding: 5rpx 10rpx;
-  color: #555;
-}
-
-#logout {
-  margin-top: 5rpx;
-  border: 1px solid #ccc;
   width: 120rpx;
-  font-size: 24rpx;
-  padding: 5rpx 10rpx;
-  color: #555;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
 }
 
+/*下面的白色容器 */
+.main-box {
+  position: sticky;
+  z-index: 1;
+  background-color: #fff;
+  /* 减去140px */
+  height: calc(100vh - 120px);
+  margin-top: -20px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 10px;
+}
+
+
+
+/* 获赞、关注、粉丝数目 */
 .counts {
-  margin-top: 16rpx;
   width: 80%;
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  justify-items: flex-start;
   color: #555;
+  font-size: 12px;
+}
 
+/* 数字 */
+.counts strong {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.counts view {
+  margin-right: 10px;
+}
+
+/* 上传作品按钮 */
+/* 用id选择器 覆盖默认按钮样式 */
+#btns {
+  /* background-color: rgb(194, 17, 17); */
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#btns button {
+  box-sizing: border-box;
+  box-shadow: 1px 1px 8px 1px green;
+  width: 80px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   font-size: 24rpx;
+  padding: 5px;
+  color: green;
 }
 
-
-/* 用户 */
-.preference {
-  margin-top: 20rpx;
+#btns #logout {
+  color: red;
+  box-shadow: 1px 1px 8px red;
 }
+
 
 .tabs {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   background-color: #F5F5F5;
 
 }
 
-.tabs view {
-  width: 33.33%;
+.tabs .tab-item {
+  flex: 1;
   text-align: center;
-  font-size: 48rpx;
+  font-size: 14px;
+  padding: 5px;
+  color: #777;
 }
 
+/* 选中的tab */
 .tabs view.active {
-  background-color: greenyellow;
-  color: #fff;
+  color: #000;
+  font-weight: bold;
+  border-radius: 5px;
+  box-shadow: inset -1px -1px 6px 1px #01847f;
 }
 
+/* tab对应的内容容器 */
 .content {
-  margin-top: 20rpx;
-  background-color: rgb(173, 226, 47);
-  padding: 20rpx;
+  margin-top: 10px;
+  /* background-color: rgb(173, 226, 47); */
+  /* padding: 20rpx; */
+  height: calc(50vh - 50rpx);
 }
 
-.Itembox {
-  width: 100%;
+.tab-swiper {
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+
+.video-list {
+  height: 500px;
+}
+
+.video-item {
+  max-width: 100%;
+  margin: 10rpx 0;
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 10rpx 0;
 }
 
+.vtitle {
+  max-width: 60%;
+  /* background-color: darkgray; */
+  text-decoration: underline;
 
- .text {
-  padding: 10rpx 20rpx;
-  background-color: rgb(204, 182, 182);
-  width: 80%;
 }
-.deleteBtn {
+
+.vbtns {
+  min-width: 40%;
   text-align: center;
-  padding: 10rpx;
-  color: #fff;
-  border-radius: 10rpx;
-  background-color: red;
-} 
+  display: flex;
+  justify-content: space-evenly;
+  /* background-color: darkorange; */
+}
+.vbtns view {
+  border: 1px solid #ccc;
+  border-radius: 8rpx;
+  padding: 5rpx 6rpx;
+}
+.editBtn,.findBtn {
+  background-color: #fff;
+}
+.deleteBtn,.cancel {
+  color: red;
+}

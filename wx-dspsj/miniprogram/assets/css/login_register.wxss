@@ -1,0 +1,58 @@
+/*
+注册登录共用样式
+\*/
+
+.banner {
+  height: 244px;
+  width: 100%;
+}
+/*表单内容*/
+.inputView {
+  background-color: #fff;
+  padding: 20rpx;
+  line-height: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  margin-bottom: 10rpx;
+}
+
+
+.input-label {
+  width: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+  color: #999;
+
+}
+.input-label image{
+  width: 20px;
+  height: 20px;
+}
+.inputText {
+  width: 60%;
+  padding: 0 20rpx;
+  float: right;
+  text-align: right;
+  font-size: 15px;
+}
+
+
+
+/*按钮*/
+.submitBtn {
+  width: 80%;
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.goBtn {
+  width: 80%;
+  text-align: center;
+  margin-top: 40rpx;
+  font-size: 16px;
+  padding: 0;
+}

@@ -1,25 +1,27 @@
 /**app.wxss**/
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+view {
   box-sizing: border-box;
 }
 
-button {
-  background: initial;
+image {
+  width: 100%;
+  height: 100%;
 }
-button:focus {
-  outline: 0;
-}
-button::after {
-  border: none;
+
+video {
+  width: 100%;
 }
 
 page {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  background-color: whitesmoke;
+}
+
+/* 隔行线 */
+.line {
+  width: 100%;
+  height: 1px;
+  background-color: gainsboro;
+  margin-top: 1px;
 }
 
 /* 单行显示
@@ -29,12 +31,129 @@ page {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
 /* 三行显示 */
-.three-line{
+.three-line {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   word-break: break-all;
+}
+
+/* 空盒子 */
+.empty {
+  width: 100%;
+  height: 100%;
+  font-size: 50rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-style: italic;
+}
+
+.empty::after {
+  content: '~~~';
+}
+
+.page-center {
+  /* background-color: darkred; */
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 模态框 */
+.mask {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: rgba(0, 0, 0, .5);
+}
+
+.modal {
+  position: relative;
+  border-radius: 30rpx;
+  width: 90%;
+  background-color: #fff;
+  padding: 20rpx;
+}
+
+.modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-weight: bold;
+  font-size: 40rpx;
+}
+
+.modal-close {
+  width: 60rpx;
+  height: 60rpx;
+  text-align: center;
+  line-height: 40rpx;
+  font-size: 60rpx;
+  border-radius: 50%;
+  /* background-color: red; */
+  /* border: 2px solid #ccc; */
+  color: red;
+}
+
+.btn-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+text.btn {
+  text-align: center;
+  box-shadow: 1px 1px 8px 1px #04781f;
+  border-radius: 10rpx;
+  padding: 5rpx;
+}
+
+/* 输入表单统一样式 */
+
+.input-item {
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.input-item label {
+  font-size: 14px;
+  color: #777;
+  vertical-align: middle;
+
+}
+
+label.required i {
+  color: red;
+}
+
+input,
+textarea {
+  padding: 4px;
+  background-color: #fff;
+  border-radius: 10rpx;
+  border: 2px solid #87a2b4;
+}
+
+.input-item textarea,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 80rpx;
+  max-height: 200rpx;
 }

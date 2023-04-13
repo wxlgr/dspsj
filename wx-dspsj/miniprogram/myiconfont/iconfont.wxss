@@ -1,17 +1,31 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3499926 */
   src: 
-       url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAP0AAsAAAAACDwAAAOmAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHFQGYACDHAqDaINAATYCJAMQCwoABCAFhGcHRRtFB1GUDkqS7OeAu7ncUEszci0s9owt2B++3XNmZmYjCfHw3360+2Zm3ZtrE6viaZMolLCVBFVDITRCJ0QO0TP5D8yr7d7U9NKhCQ8qCYpQEiob/fo1DYOLWmGStJU3dcAK7eE7/JDZ25CrTa2qU1SAxv9zOb6GF/b82wFAcywOT6OzFtCBNdawLX6v5wlyw9jFZdwi0GiRO9z+7fNbZfTaF1NZ4KXhg7A4XmeJX+mwOqWkONQLtXVnFvFODelN+oa3Lvnxz3LUk9Rk2jrH9zdR5fsHv/P8Wb2Qv7NxAuydUIOM2ZkZ4rHcdq3ux2bxaMz7TcM6QL16iZ/4efqdVxUUrEpWr//lEbJE1NIKm8Eqimd+wkQJfp5QMr/zpIS70r8ejXiPcReIrioFZa+WDiikf0JDMasSOgrdCL4Urjw/B1iNmw0bdchltlQZEDZ9rsCCy8ssBGmVb+2ThaBm2eYOOdgZIdfSr4DCLQptXfII2gZI6yQIF4xWDecPVY6gfhlWKdzaCYKXmhssQK8wowq+YAGg8yyouTm5Ehr1lAu4pQOAtolUoVdXBZfIpbmPk7uPrrLoj7K9kjua6+2bDVvbCC6Fcd6uoID/lYSVtoKzg6PgvFF53oDjjsavLvk5qGm+LN5hByO78R1CFYszJj9CQfFlCw9MPb25fudL1eQn3Z4lrPoF8LKN3LXxtYlZdVMOj7rtFeAvrhfO91ZMxWzJbrAs2CoANcKMjw22w8bs6LMw2DrQ0j/GBDbJwOVxbAryNrFg7QAtiOEXSshFtdwoamg8eHlW8wzxl8F22MGGAFkF1VxlB0D+kre4jpccL7qXzwtr327b5f/6poOs+fF/nEG+alGf96L4Eu+1yq9qYhbZTyl5IlPwqyQudLg1kkbdyHtM0emmD0VXbSah6AohqTMEWb1hpNCnoUaTZahVbwMazfCb36QLWV2UBowrAhDaDUPS6itk7Q6RQr+CGr1eoVa7X2h0GcPVmozHzRXDF0SUdiRSaE1sKMUl+oJkq3zOCn+AywwGycrcMpm8gwF3MYa2Sy7oEhOerSZ/uh+UskRmmyOUFVFk41hY4PPuskq3unKFgU9AhKQ5IiQhy4htbIl/3wtIbCk+rol8WFiJuYg4sWLOsgZyJzO1Ks6kPc1O4gKdiHE/PGZpxF+2gNJjFiHnd8tBSKwQW0Q2HBYIC19XthpfoS9vCzTSziiRIkeJGuW13aFbis9LfKZUZ/+yNYyUlQoAAA==') format('woff2'),
-       url('iconfont.ttf?t=1656998059163') format('truetype');
+       url('data:application/x-font-woff2;charset=utf-8;base64,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') format('woff2'),
+       url('//at.alicdn.com/t/c/font_3499926_n4rvqfyz8x.ttf?t=1681111658423') format('truetype');
 }
 
 .iconfont {
   font-family: "iconfont" !important;
-  font-size: 40px;
-  color: #ccc;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-download:before {
+  content: "\e7ef";
+}
+
+.icon-share:before {
+  content: "\e6cc";
+}
+
+.icon-user:before {
+  content: "\e7ae";
+}
+
+.icon-outline-video-square:before {
+  content: "\e6c9";
 }
 
 .icon-love:before {
@@ -25,4 +39,3 @@
 .icon-comments:before {
   content: "\e689";
 }
-

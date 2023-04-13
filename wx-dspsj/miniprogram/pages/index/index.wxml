@@ -1,74 +1,75 @@
 <!--pages/videos/index.wxml-->
 <swiper wx:if="{{videoList.length>0}}" class="myswiper" vertical bindchange="onMySwiperChange">
   <block wx:for="{{videoList}}" wx:key="item">
-    <swiper-item class="swiper-item" bindtap="hideComments">
+    <swiper-item class="swiper-item">
       <!-- 编程式控制播放 -->
-      <video custom-cache="{{false}}" id="myvideo{{index}}" enable-danmu='true' src="{{item.path}}" object-fit="fill" enable-progress-gesture="true" enable-play-gesture="true" loop></video>
-
+      <video id="video{{index}}" src="{{item.videoUrl}}" object-fit="cover" show-fullscreen-btn="{{false}}" enable-play-gesture loop></video>
       <!-- 图标按钮等 -->
       <block>
         <!--标题  -->
-        <view class="vtitle single-line">视频：{{item.title||'暂无标题'}}（支持按字体的方式去动态调整图标大小，颜色等等。
-          默认情况下不支持多色，直接添加多色图标会自动去色。）</view>
-
+        <view class="vtitle single-line">{{item.title||'暂无标题'}}（支持按字体的方式去动态调整图标大小，颜色等等。</view>
         <!-- @作者 -->
         <!-- 视频描述 -->
-        <view bindtap="clickAuthor" class="vauthor">@{{item.author}}</view>
-        <view class="vdesc three-line">{{item.desc||'暂无视频描述'}}。
-          （支持按字体的方式去动态调整图标大小，颜色等等。
-          默认情况下不支持多色，直接添加多色图标会自动去色。）</view>
-
+        <view bindtap="clickAuthor" class="vauthor">@{{item.author.username}}</view>
+        <view class="vdesc three-line">{{item.desc||'暂无视频描述'}}</view>
         <!-- 绝对定位的图标 -->
-
-        <view class="download">
-          <image bindtap="downVideo" src="../../images/camera.png"></image>
+        <view bindtap="downVideo" class="download">
+          <view class="iconfont icon-download"></view>
         </view>
-
+      </block>
+      <!-- 右侧定位图标 -->
+      <view class="right-icons">
         <!-- 作者头像 -->
-        <view class="iconbox avatar">
-          <image bindtap="clickAuthor" class="avatar" src="{{item.avatar}}"></image>
+        <view class="icon-box avatar">
+          <image bindtap="clickAuthor" src="{{ item.author.avatarUrl||avatarDefault}}"></image>
         </view>
-
         <!-- 喜欢 -->
-        <view class="iconbox love">
-          <view class="iconfont icon-love {{item.userLiked?'active':''}}" bindtap="clickLove"></view>
+        <view class="icon-box love">
+          <view class="iconfont icon-love {{item.meta.isUserLiked?'active':''}}" bindtap="clickLove"></view>
           <text>{{item.star}}</text>
         </view>
         <!-- 评论 -->
-        <view class="iconbox comment">
-          <view class="iconfont icon-comments" catchtap="saySome"></view>
+        <view class="icon-box comment">
+          <view bindtap="clickComents" class="iconfont icon-comments"></view>
           <text>{{item.comments.length}}</text>
         </view>
         <!-- 收藏 -->
-        <view class="iconbox collection">
-          <view class="iconfont icon-star-fill {{item.userCollected?'active':''}}" bindtap="clickCollection"></view>
+        <view class="icon-box collection">
+          <view class="iconfont icon-star-fill {{item.meta.isUserCollected?'active':''}}" bindtap="clickCollection"></view>
+          <text>{{item.collect}}</text>
+        </view>
+        <!-- 分享 -->
+        <view class="icon-box share">
+          <view bindtap="shareVideo" class="iconfont icon-share">
+          </view>
           <text>{{item.collection}}</text>
         </view>
+      </view>
 
-        <!-- 留言区 -->
-        <scroll-view scroll-y="true" class="commentbox" wx:if="{{item.showComments}}" catchtap="doNothing">
-          <!-- 留言评论 -->
-          <view class="header">
-            <input type="text" class="sayInput" model:value="{{mysay}}" bindinput="doNothing" placeholder="善语结善缘,恶语伤人心~" />
-            <button id="sendBtn" size="mini" plain bindtap="doSay">发送</button>
+      <!-- 留言区其他区域 点击用于关闭留言区-->
+      <view class="mask" wx:if="{{item.meta.isShowComments}}" bindtap="closeComments">
+      </view>
+      <!-- 留言区 -->
+      <scroll-view scroll-y class="commentbox" wx:if="{{item.meta.isShowComments}}">
+        <!-- 留言评论 -->
+        <view class="header">
+          <input type="text" class="sayInput" model:value="{{mysay}}" placeholder="善语结善缘,恶语伤人心~" />
+          <button id="sendBtn" type="primary" size="mini" bindtap="doSay">发送</button>
+        </view>
+        <!-- 留言展示 -->
+        <view class="commentItem" wx:for="{{item.comments}}" wx:for-item="i" wx:key="i">
+          <view class="sayer-avatar">
+            <image src="{{baseUrl+i.who.avatarPath}}" />
           </view>
-
-          <!-- 留言展示 -->
-          <view class="commentItem" wx:for="{{item.comments}}" wx:for-item="i" wx:key="i">
-            <view class="sayer-avatar">
-              <image wx:if="{{hasAvatar}}" src="https://636c-cloud1-0gw35w8nc306005d-1310549532.tcb.qcloud.la/users/{{i.username}}_avatar.jpg?{{nowTime}}"></image>
-              <image wx:else src="../../images/noneface.png"></image>
-            </view>
-            <view class="content">
-              <text class="who">{{i.username}} </text>
-              <text class="time">于 {{i.time}}</text> 留言：
-
-              <view class="say">{{i.say}} </view>
-              <text wx:if="{{i.username==userInfo.username}}" style="float: right;margin:0 20rpx;font-size: 36rpx;" data-comment-index="{{index}}" bindtap="deleteMysay">删除</text>
-            </view>
+          <view class="content">
+            <text class="who">{{i.who.username}} </text>
+            <view class="say">{{i.say}} </view>
+            <text class="time">{{i.when}}</text>
+            <view class="deleteBtn" wx:if="{{i.who._id==userInfo._id}}" data-comment-index="{{index}}" bindtap="deleteMysay">删除</view>
           </view>
-        </scroll-view>
-      </block>
+        </view>
+      </scroll-view>
+
     </swiper-item>
   </block>
 </swiper>
