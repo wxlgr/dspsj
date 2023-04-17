@@ -92,12 +92,6 @@ userRouter.post("/update", async function (req, res) {
   // 新的用户信息对象
   let newUserInfo = req.body;
 
-  // 删除旧头像文件
-  let { removeFilePath } = req.body;
-  console.log(removeFilePath);
-  if (removeFilePath) {
-    removeFile(removeFilePath);
-  }
   // 用户id
   let _id = req.body._id;
 

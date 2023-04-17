@@ -1,7 +1,7 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { linkUrls, uniqueSuffix } = require("../utils");
+const { linkUrls, uniqueSuffix, removeFile } = require("../utils");
 const moment = require("moment");
 const {
   baseUrl,
@@ -101,7 +101,7 @@ singleFileUploads.forEach((item) => {
         code: 0,
         result: {
           url: fUrl,
-          path: rPath
+          path: rPath,
         },
         msg: `${item.field} upload success`,
       });
@@ -132,11 +132,32 @@ uploadRouter.post(
       code: 0,
       result: {
         photos,
-        photosPath
+        photosPath,
       },
       msg: "photos upload success",
     });
   }
 );
+
+// 删除文件
+
+uploadRouter.post("/delete", async function (req, res) {
+  const {filePath} = req.body;
+  try {
+    const result = await removeFile(filePath);
+    res.send({
+      code: 0,
+      result,
+      msg: "delete success",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.send({
+      code: 1,
+      result: null,
+      msg: error.message,
+    });
+  }
+});
 
 module.exports = uploadRouter;

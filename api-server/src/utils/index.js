@@ -18,20 +18,28 @@ function uniqueSuffix(n = 8) {
 
 const fs = require("fs");
 const path = require("path");
+/**
+ * 删除文件
+ * @param {String} fpath
+ */
 function removeFile(fpath) {
   fpath = path.resolve(__dirname, "../../", fpath);
   let dir = path.dirname(fpath);
 
-  try {
+  return new Promise((resolve, reject) => {
+    if (!fs.existsSync(fpath) || !fs.accessSync) {
+      reject(new Error(`文件不存在或不可删除`));
+    }
     fs.unlinkSync(fpath);
+    resolve(`文件删除成功`);
+    console.log(`${fpath} 删除成功`)
+    
+
     if (fs.readdirSync(dir).length === 0) {
       fs.rmdirSync(dir);
       console.log(`空文件夹 ${dir}已删除`);
     }
-    console.log(fpath, "删除成功");
-  } catch (e) {
-    console.log(fpath, "文件不存在");
-  }
+  });
 }
 
 module.exports = {

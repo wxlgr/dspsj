@@ -18,10 +18,7 @@ let bgmSchema = new mongoose.Schema(
     bgmPath: {
       type: String,
       required: true,
-    },
-
-    // 是否公开
-    isPublic: { type: Boolean, default: true },
+    }
   },
   { timestamps: true }
 );

@@ -1,5 +1,4 @@
 @import '../../myiconfont/iconfont.wxss';
-
 .myswiper {
   height: 100vh;
   background-color: black;
@@ -14,6 +13,9 @@
 
 
 .vtitle {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 10rpx;
   font-weight: bold;
   font-style: italic;
   color: #ff6700;
@@ -22,7 +24,7 @@
   left: 50%;
   transform: translateX(-50%);
   max-width: 80%;
-  top: 20rpx;
+  top: 30rpx;
 }
 
 /*  */

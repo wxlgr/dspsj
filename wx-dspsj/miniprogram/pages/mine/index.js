@@ -1,7 +1,4 @@
 import {
-  baseApiUrl
-} from '../../api/base';
-import {
   checkAuth
 } from '../../utils/checkAuth'
 import api from '../../api/index';
@@ -85,6 +82,12 @@ Page({
       url: '../login/index',
     })
   },
+  // 跳转bgm管理页面
+  goBGM() {
+    wx.navigateTo({
+      url: '../bgm/index',
+    })
+  },
   // 跳转上传视频页
   goVideoUpload() {
     wx.navigateTo({
@@ -106,37 +109,27 @@ Page({
       count: 1
     })
     const tempPath = res.tempFiles[0].tempFilePath
-    // console.log(tempPath);
-
-    wx.showLoading({
-      title: '请等待……',
-    })
-    const data = await api.uploadFile(tempPath, "avatar")
-    console.log(data);
+    const {result} = await api.uploadFile(tempPath, "avatar")
     // 相对路径path，访问地址url
     const {
       path,
       url
-    } = data.avatar
-
+    } = result
     // 数据库更新 需传入用户id
     const {
       userInfo,
-      baseUrl
     } = this.data;
     const updatedUser = await api.updateUser({
       _id: userInfo._id,
       avatarPath: path,
-      // 用于删除
-      removeFilePath: userInfo.avatarPath
     })
-    if (updatedUser) {
-      wx.hideLoading()
+    // 删除旧文件
+    const removeFile = await api.deleteFile(userInfo.avatarPath)
+    if (updatedUser && removeFile) {
       wx.showToast({
         title: '更换成功',
       })
     }
-
     // 更新显示头像
     this.setData({
       avatarUrl: url,
@@ -173,7 +166,7 @@ Page({
     const {
       result
     } = await api.findUserWorks(uid)
-    console.log(result);
+    // console.log(result);
     this.setData({
       myWorks: result
     })
@@ -230,11 +223,6 @@ Page({
     const video = this.data.myWorks[index]
     wx.navigateTo({
       url: '../playVideo/index?index=' + index,
-      events: {
-        cb(msg) {
-          console.log("mine收到反馈", msg);
-        }
-      },
       success: (res => {
         res.eventChannel.emit("video", video)
       })
@@ -260,6 +248,7 @@ Page({
     // 作品，私密，喜欢，收藏数组
     const myXXXs = tabList[activeTabIndex].videos
     const video = this.data[myXXXs][index]
+    console.log(video);
     this.setData({
       'modal.show': true,
       'modal.justlook': justlook,
@@ -307,14 +296,18 @@ Page({
       title: '确认删除此视频？',
       success: (async res => {
         if (res.confirm) {
-          console.log(video._id);
+
+          // 数据库删除
           const {
             result
           } = await api.deleteVideo({
             _id: video._id,
-            removeFilePath: video.videoPath
           })
-          if (result) {
+          // 删除文件
+          const {
+            code
+          } = await api.deleteFile(video.videoPath)
+          if (result && code === 0) {
             console.log(result);
             wx.showToast({
               title: '删除成功',

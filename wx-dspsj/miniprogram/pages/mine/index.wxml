@@ -23,26 +23,27 @@
     <view bindtap="fansHandle"><strong>{{myFansCount}}</strong> 粉丝</view>
   </view>
   <!-- 上传作品、注销登录按钮 -->
-  <view id="btns">
-    <button id="uploadVideo" bindtap="goVideoUpload">上传作品</button>
-    <button id="logout" bindtap="logout">注销</button>
+  <view class="flex-between  mb20 mt20">
+    <view class="shadwbtn" bindtap="goVideoUpload">上传作品</view>
+    <view class="shadwbtn" bindtap="goBGM">bgm列表</view>
+    <view class="shadwbtn warn" bindtap="logout">注销</view>
   </view>
   <!-- tabs -->
   <view class="tabs" wx:if="{{logined}}">
-    <view bindtap="clickTab" id="{{item.id}}" wx:for="{{ tabList}}" wx:key="id" data-index="{{index}}" class="{{ activeTabIndex==index?'active tab-item':'tab-item'}}">{{item.name}}</view>
+    <view bindtap="clickTab" id="{{item.id}}" wx:for="{{ tabList}}" wx:key="id" data-index="{{index}}" class="{{ activeTabIndex==index?'active tab':'tab'}}">{{item.name}}</view>
   </view>
   <!-- tab content -->
   <view class="content">
-    <swiper class="tab-swiper" current="{{activeTabIndex}}" bindchange="tabSwiperChange">
+    <swiper circular class="tab-swiper" current="{{activeTabIndex}}" bindchange="tabSwiperChange">
       <swiper-item class="swiper-item">
         <view wx:if="{{myWorks.length===0}}" class="empty">空空如也</view>
         <block wx:else>
-          <scroll-view class="video-list" scroll-y>
-            <view class="video-item" wx:for="{{myWorks}}" wx:key="item">
+          <scroll-view class="list" scroll-y>
+            <view class="list-item" wx:for="{{myWorks}}" wx:key="item">
               <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
                 {{item.title}}
               </view>
-              <view class="vbtns">
+              <view class="btns">
                 <view class="editBtn" data-index="{{index}}" bindtap="openModal">编辑</view>
                 <view class="findBtn" data-index="{{index}}" data-justlook="{{true}}" bindtap="openModal">查看</view>
                 <view class="deleteBtn" data-index="{{index}}" bindtap="deleteVideo">删除</view>
@@ -54,12 +55,12 @@
       <swiper-item class="swiper-item">
         <view wx:if="{{mySecrets.length===0}}" class="empty">空空如也</view>
         <block wx:else>
-          <scroll-view class="video-list" scroll-y>
-            <view class="video-item" wx:for="{{mySecrets}}" wx:key="item">
+          <scroll-view class="list" scroll-y>
+            <view class="list-item" wx:for="{{mySecrets}}" wx:key="item">
               <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
                 {{item.title}}
               </view>
-              <view class="vbtns">
+              <view class="btns">
                 <view class="editBtn" data-index="{{index}}" bindtap="openModal">编辑</view>
                 <view class="findBtn" data-index="{{index}}" data-justlook="{{true}}" bindtap="openModal">查看</view>
                 <view class="deleteBtn" data-index="{{index}}" bindtap="deleteVideo">删除</view>
@@ -71,13 +72,13 @@
       <swiper-item class="swiper-item">
         <view wx:if="{{myLikes.length===0}}" class="empty">空空如也</view>
         <block wx:else>
-          <scroll-view class="video-list" scroll-y>
-            <view class="video-item" wx:for="{{myLikes}}" wx:key="item">
+          <scroll-view class="list" scroll-y>
+            <view class="list-item" wx:for="{{myLikes}}" wx:key="item">
               <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
                 {{item.title}}
               </view>
               <!-- 本人作品才可操作 -->
-              <view class="vbtns">
+              <view class="btns">
                 <view class="findBtn" data-index="{{index}}" data-justlook="{{true}}" bindtap="openModal">查看</view>
 
                 <!-- 取消喜欢 -->
@@ -90,12 +91,12 @@
       <swiper-item class="swiper-item">
         <view wx:if="{{myCollects.length===0}}" class="empty">空空如也</view>
         <block wx:else>
-          <scroll-view class="video-list" scroll-y>
-            <view class="video-item" wx:for="{{myCollects}}" wx:key="item">
+          <scroll-view class="list" scroll-y>
+            <view class="list-item" wx:for="{{myCollects}}" wx:key="item">
               <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
                 {{item.title}}
               </view>
-              <view class="vbtns">
+              <view class="btns">
                 <view class="findBtn" data-index="{{index}}" data-justlook="{{true}}" bindtap="openModal">查看</view>
                 <!-- 取消收藏 -->
                 <view class="cancel" data-index="{{index}}" bindtap="cancelLikeOrCollect">移除</view>

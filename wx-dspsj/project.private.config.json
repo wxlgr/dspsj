@@ -1,6 +1,6 @@
 {
   "setting": {
-    "compileHotReLoad": false,
+    "compileHotReLoad": true,
     "urlCheck": false,
     "preloadBackgroundData": false
   },
@@ -106,6 +106,13 @@
         {
           "name": "",
           "pathName": "pages/first/index",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/bgm/index",
           "query": "",
           "launchMode": "default",
           "scene": null

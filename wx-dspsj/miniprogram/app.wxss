@@ -1,4 +1,7 @@
-/**app.wxss**/
+.container {
+  padding: 20rpx;
+}
+
 view {
   box-sizing: border-box;
 }
@@ -16,6 +19,74 @@ page {
   background-color: whitesmoke;
 }
 
+
+.shadwbtn {
+  box-sizing: border-box;
+  box-shadow: 1px 1px 8px 1px green;
+  margin: 0 10rpx;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 24rpx;
+  padding: 5px;
+  color: green;
+}
+
+.shadwbtn.warn {
+  color: red;
+  box-shadow: 1px 1px 8px red;
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  background-color: #F5F5F5;
+}
+
+.tabs .tab {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  padding: 5px;
+  color: #777;
+}
+
+/* 选中的tab */
+.tabs .tab.active {
+  color: #000;
+  font-weight: bold;
+  border-radius: 5px;
+  /* background-color: #fff; */
+  box-shadow: 1px 1px 6px 1px #ff6700;
+}
+
+
+.vtitle,.title {
+  flex: 1;
+  padding: 10rpx;
+  text-decoration: underline;
+}
+.btns {
+  /* min-width: 40%; */
+  text-align: center;
+  display: flex;
+  justify-content: space-evenly;
+}
+.btns view {
+  border: 1px solid #ccc;
+  border-radius: 8rpx;
+  padding: 5rpx 6rpx;
+  margin-left: 10rpx;
+}
+.editBtn,
+.findBtn {
+  background-color: #fff;
+}
+.deleteBtn,
+.warn,
+.cancel {
+  color: red;
+}
+
 /* 隔行线 */
 .line {
   width: 100%;
@@ -27,6 +98,7 @@ page {
 /* 单行显示
 */
 .single-line {
+  width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -104,22 +176,7 @@ page {
   line-height: 40rpx;
   font-size: 60rpx;
   border-radius: 50%;
-  /* background-color: red; */
-  /* border: 2px solid #ccc; */
   color: red;
-}
-
-.btn-area {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-text.btn {
-  text-align: center;
-  box-shadow: 1px 1px 8px 1px #04781f;
-  border-radius: 10rpx;
-  padding: 5rpx;
 }
 
 /* 输入表单统一样式 */
@@ -156,4 +213,32 @@ textarea {
   box-sizing: border-box;
   min-height: 80rpx;
   max-height: 200rpx;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mt20 {
+  margin-top: 20rpx;
+}
+
+.mb20 {
+  margin-bottom: 20rpx;
+}
+
+.pd20 {
+  padding: 20rpx;
 }

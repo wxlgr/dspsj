@@ -1,0 +1,20 @@
+<!--pages/playBgm/index.wxml-->
+<view class="page-center">
+  <view class="container">
+    <view class="music-info">
+      <view class="title">{{bgm.title}}</view>
+    </view>
+    <view class="music-player">
+      <slider value="{{percent}}" bindchanging="bindchanging" 
+      bindchange="bindchanged"
+      block-color="#01847f"
+      block-size="15"/>
+      <view class="time flex-between">
+        <view class="now">{{nowTime?nowTime:'00:00'}}</view>
+        <i bindtap="playMusic" wx:if="{{!isPlaying}}" class="iconfont icon-play1"></i>
+        <i bindtap="pauseMusic" wx:else class="iconfont icon-pause1"></i>
+        <view class="all">{{allTime}}</view>
+      </view>
+    </view>
+  </view>
+</view>

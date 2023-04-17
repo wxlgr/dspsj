@@ -76,6 +76,22 @@ const videosApi = {
   deleteVideo(videoObj) {
     return request.post('/videos/delete', videoObj)
   },
+  /**
+   * 制作影集
+   * @param {*} photos 
+   */
+  makeAlbums(obj={
+    bgmUrl:'',
+    photoUrls:[]
+  }) {
+    return request.post('/videos/makeAlbums', obj)
+  },
+  makeVideo(options = {
+    videoUrl: '',
+    bgmUrl: ''
+  }) {
+    return request.post('/videos/makeVideo',options)
+  }
 }
 
 export {

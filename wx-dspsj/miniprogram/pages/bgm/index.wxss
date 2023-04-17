@@ -1,0 +1,62 @@
+/* pages/bgm/index.wxss */
+@import '../../myiconfont/iconfont.wxss';
+
+.bgm-list {
+  margin-top: 20rpx;
+  /* background-color: brown; */
+  height: calc(100vh - 64px);
+}
+
+.bgm {
+  margin-bottom: 20rpx;
+}
+
+/* 其实相当于点击后 */
+.bgm:hover {
+  background-color: burlywood;
+  border-radius: 10rpx;
+}
+
+.title {
+  max-width: 50%;
+  overflow: hidden;
+  /* background-color: chocolate; */
+}
+
+.bgm .process {
+  font-size: 14px;
+  margin-right: 30rpx;
+}
+
+i.iconfont {
+  color: #333;
+  font-size: 48rpx;
+  margin-right: 5rpx;
+}
+.list {
+  /* background-color: blueviolet; */
+  height: 10000px;
+}
+
+.list-item{
+  max-width: 100%;
+  margin: 10rpx 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn-area view {
+  border: 1px solid #ccc;
+  border-radius: 8rpx;
+  padding: 5rpx 6rpx;
+  margin-left: 10rpx;
+}
+.editBtn,
+.findBtn {
+  background-color: #fff;
+}
+.deleteBtn,
+.cancel {
+  color: red;
+}
+

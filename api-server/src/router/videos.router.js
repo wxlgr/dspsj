@@ -56,8 +56,6 @@ videosRouter.post("/makeAlbums", async (req, res) => {
   try {
     let { bgmUrl, photoUrls } = req.body;
 
-    photoUrls = JSON.parse(photoUrls);
-
     const taskId = startFFTask(() =>
       createAlbumFFTask({
         imgs: photoUrls,
@@ -84,7 +82,7 @@ videosRouter.post("/makeAlbums", async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    request.send({
+    res.send({
       code: 1,
       msg: "未知错误！",
       result: null,
@@ -141,12 +139,6 @@ videosRouter.post("/update", async (req, res) => {
 videosRouter.post("/delete", async (req, res) => {
   // 视频id
   let _id = req.body._id;
-
-  // 删除视频文件
-  let { removeFilePath } = req.body;
-  if (removeFilePath) {
-    removeFile(removeFilePath);
-  }
 
   const video = await videosModel.findByIdAndDelete(_id);
 

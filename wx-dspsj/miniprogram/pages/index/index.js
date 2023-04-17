@@ -25,6 +25,8 @@ Page({
     this.getUserInfo()
     //获取视频列表
     this.getAllVideos()
+
+
   },
   onShow() {
     //查询用户喜爱、收藏记录
@@ -110,7 +112,7 @@ Page({
     })
     // console.log(videos[0]);
     this.setData({
-      videoList: videos,
+      videoList: videos.reverse(),
     })
 
     // 初始化视频播放器数组
@@ -158,7 +160,6 @@ Page({
       currentIndex
     } = this.data
     const video = videoList[currentIndex]
-    console.log(video);
     //
     wx.showModal({
       title: '确定下载该视频?',
@@ -168,22 +169,26 @@ Page({
           wx.downloadFile({
             url: video.videoUrl,
             success: (res => {
-              // 保存视频到相册
-              wx.saveVideoToPhotosAlbum({
-                filePath: res.tempFilePath,
-              }).then(errMsg => {
-                wx.showToast({
-                  title: '视频下载成功',
+              if (res.statusCode === 200) {
+                // 保存视频到相册
+                wx.saveVideoToPhotosAlbum({
+                  filePath: res.tempFilePath,
+                }).then(res => {
+                  wx.showToast({
+                    title: '下载成功',
+                  })
+                }).catch(err => {
+                  wx.showToast({
+                    icon: 'error',
+                    title: '已取消下载',
+                  })
                 })
-              })
-
+              }
             })
           })
         }
       })
     })
-
-
   },
 
   // 统一处理点击喜欢或者点击收藏按钮的函数

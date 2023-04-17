@@ -3,11 +3,13 @@
   <block wx:for="{{videoList}}" wx:key="item">
     <swiper-item class="swiper-item">
       <!-- 编程式控制播放 -->
-      <video id="video{{index}}" src="{{item.videoUrl}}" object-fit="cover" show-fullscreen-btn="{{false}}" enable-play-gesture loop></video>
+      <video id="video{{index}}" src="{{item.videoUrl}}"  
+      object-fit="fill"
+      show-fullscreen-btn="{{false}}" enable-play-gesture loop></video>
       <!-- 图标按钮等 -->
       <block>
         <!--标题  -->
-        <view class="vtitle single-line">{{item.title||'暂无标题'}}（支持按字体的方式去动态调整图标大小，颜色等等。</view>
+        <view class="vtitle single-line">{{item.title||'暂无标题'}}</view>
         <!-- @作者 -->
         <!-- 视频描述 -->
         <view bindtap="clickAuthor" class="vauthor">@{{item.author.username}}</view>

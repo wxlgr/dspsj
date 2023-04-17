@@ -2,19 +2,17 @@
 Page({
   data: {
     videoUrl: '',
-    videoInfo:{}
+    videoInfo: {}
   },
   onLoad(options) {
     const baseUrl = getApp().globalData.baseUrl
     this.player = wx.createVideoContext('video')
-    console.log(+options.index)
     const eventChannel = this.getOpenerEventChannel()
-    eventChannel.emit('cb', "已拿到video对象信息");
     // 接受
-    eventChannel.on('video', (data)=> {
+    eventChannel.on('video', (data) => {
       this.setData({
         videoUrl: baseUrl + data.videoPath,
-        video:data
+        video: data
       })
       this.player.play()
     })
@@ -28,7 +26,10 @@ Page({
             src: res.tempFilePath,
           })
           this.setData({
-            videoInfo:{...videoInfo,size:(videoInfo.size/1024).toFixed(2)}
+            videoInfo: {
+              ...videoInfo,
+              size: (videoInfo.size / 1024).toFixed(2)
+            }
           })
         }
       })

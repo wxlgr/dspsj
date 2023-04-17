@@ -4,13 +4,21 @@ import {
 } from '../../utils/checkAuth'
 Page({
   data: {
+    baseUrl: '',
     uid: '',
-    tempFilePath: '', //视频暂存地址
-    size: '', //视频大小,
+    tempPhotosPath: [], //相册暂存地址
+    // 最后的作品视频链接
+    videoPath: '',
+    // 是否已加工
+    processed: false,
+    // 是否可以发布
+    canPublish: false,
+
     video: {
       vtitle: '',
       vdesc: '',
-      isPublic: true
+      isPublic: true,
+      size: '', //视频大小,
     }
   },
   async onLoad(params) {
@@ -20,14 +28,22 @@ Page({
       })
     }
     this.setData({
-      uid: getApp().uid
+      uid: getApp().uid,
+      baseUrl: getApp().globalData.baseUrl
     })
+
   },
-  // title输入框失去焦点
-  titleBlur(e) {
+  // title输入 动态绑定video.vtitle
+  vtitleInputHandle(e) {
+    let vtitle = e.detail.value.trim()
+    const {
+      videoPath
+    } = this.data
     this.setData({
-      'video.vtitle': ('' + e.detail.value).trim()
+      canPublish: vtitle !== '' && videoPath !== '',
+      'video.vtitle': vtitle
     })
+
   },
   //选择视频
   async chooseVideo() {
@@ -41,14 +57,65 @@ Page({
       size
     } = chooseResult.tempFiles[0]
     this.setData({
-      tempFilePath,
-      size: (size / 1024 / 1024).toFixed(2) + "MB"
+      videoPath: tempFilePath,
+      tempPhotosPath: [],
+      'video.size': (size / 1024 / 1024).toFixed(2) + "MB"
+    })
+  },
+  //选择图片
+  async choosePhotos() {
+    const chooseResult = await wx.chooseMedia({
+      mediaType: 'image',
+      // 最多6张
+      count: 6
+    })
+    this.setData({
+      tempPhotosPath: chooseResult.tempFiles,
+      videoPath: ''
+    })
+
+  },
+  //添加图片
+  async addPhotos() {
+    // 选择视频
+    const chooseResult = await wx.chooseMedia({
+      mediaType: 'image',
+      // 最多6张
+      count: 6
+    })
+
+    const {
+      tempPhotosPath
+    } = this.data
+    const photos = tempPhotosPath.concat(chooseResult.tempFiles)
+
+    if (photos.length > 6) {
+      wx.showToast({
+        icon: 'error',
+        title: '最多6张图片!!',
+      })
+    }
+    this.setData({
+      tempPhotosPath: photos.slice(0, 6),
+      videoPath: ''
+    })
+  },
+
+  // 移除一张图片
+  removePhoto(e) {
+    const index = +e.target.dataset.index
+    const {
+      tempPhotosPath
+    } = this.data
+    tempPhotosPath.splice(index, 1)
+    this.setData({
+      tempPhotosPath
     })
   },
   //上传视频
   async doUploadVideo(event) {
     const {
-      tempFilePath,
+      videoPath,
       uid
     } = this.data
     let {
@@ -59,12 +126,13 @@ Page({
     // 上传视频
     const {
       result
-    } = await api.uploadFile(tempFilePath, 'video')
+    } = await api.uploadFile(videoPath, 'video')
     // 相对路径和访问地址，相对路径用于数据库存储
     const {
       path,
       url
     } = result
+    console.log(result);
     //数据库添加
     const data = await api.addVideo({
       title: vtitle,
@@ -82,5 +150,105 @@ Page({
       })
     }
   },
+  // 跳转bgm页面
+  goBGMPage() {
+    wx.navigateTo({
+      url: '../bgm/index?chosenAndBack=1',
+    })
+  },
+  cancelBgm() {
+    this.setData({
+      bgm: null
+    })
+  },
 
+  // 加工
+  async processVideo() {
+    const {
+      videoPath,
+      bgm,
+      baseUrl
+    } = this.data
+    const {
+      result: video
+    } = await api.uploadFile(videoPath, "video")
+    let obj = {
+      videoUrl: video.url,
+      bgmUrl: baseUrl + bgm.bgmPath
+    }
+    console.log(obj);
+    wx.showLoading({
+      title: '视频加工中...',
+    })
+    const processVideo = await api.makeVideo(obj)
+    if (processVideo) {
+      wx.hideLoading()
+      wx.downloadFile({
+        url: processVideo.result,
+        success: (res => {
+          if (res.statusCode === 200) {
+            this.setData({
+              videoPath: res.tempFilePath,
+              processed: true
+            })
+          }
+        })
+      })
+
+    }
+  },
+
+  // 上传图片
+  async uploadPhotos() {
+    const {
+      tempPhotosPath
+    } = this.data
+    // 服务器图片绝对地址
+    const photos = []
+    const promises = tempPhotosPath.map(item => {
+      let temp = item.tempFilePath
+      return api.uploadFile(temp, 'photos')
+    })
+    return Promise.all(promises)
+  },
+  // 制作影集
+  async makeAlbums() {
+    const results = await this.uploadPhotos()
+    const photos = results.map(item => item.result.photos[0])
+    const photosPathTobeDeleted = results.map(item => item.result.photosPath[0])
+    const {
+      bgm,
+      baseUrl
+    } = this.data
+    wx.showLoading({
+      title: '影集制作中...',
+    })
+    const album = await api.makeAlbums({
+      bgmUrl: baseUrl + bgm.bgmPath,
+      photoUrls: photos
+    })
+    if (album) {
+      console.log(album);
+      wx.hideLoading()
+      wx.showToast({
+        title: '制作成功',
+      })
+      wx.downloadFile({
+        url: album.result,
+        success: (res => {
+          if (res.statusCode === 200) {
+            this.setData({
+              videoPath: res.tempFilePath,
+              processed: true
+            })
+          }
+        })
+      })
+    
+    }
+    // 删除文件
+    photosPathTobeDeleted.forEach(async filePath => {
+      await api.deleteFile(filePath)
+    })
+  }
 })

@@ -1,0 +1,36 @@
+<!--pages/bgm/index.wxml-->
+<view class="container">
+  <view class="tabs" bindtap="changeTab">
+    <view class="tab {{currentIndex===0?'active':''}}" data-index="{{0}}">bgm列表</view>
+    <view class="tab {{currentIndex===1?'active':''}}" data-index="{{1}}">我的bgm</view>
+  </view>
+  <swiper circular bindchange="bgmSwiperChange" current="{{currentIndex}}" class="bgm-list">
+    <!-- bgm列表 -->
+    <swiper-item>
+      <view  bindtap="chooseBgm" wx:for="{{bgmList}}" wx:key="title" class="bgm flex-between">
+        <view data-index="{{index}}" bindtap="{{options.chosenAndBack?'':'goPlayBgm'}}" class="title single-line">{{item.title}}</view>
+        <view class="btns">
+          <text class="process">{{item.progressText||'00:00'}}</text>
+          <i data-index="{{index}}" catchtap="playMusic" wx:if="{{!item.isPlaying}}" class="iconfont icon-play1"></i>
+          <i data-index="{{index}}" catchtap="stopMusic" wx:else class="iconfont icon-pause1"></i>
+          <i data-index="{{index}}" catchtap="downLoadBgm" class="iconfont icon-download"></i>
+        </view>
+      </view>
+    </swiper-item>
+    <!-- 我的bgm -->
+    <swiper-item>
+      <view class="btns flex-between mt20 mb20">
+        <view class="shadwbtn" bindtap="addBGM">新增</view>
+      </view>
+      <view wx:if="{{myBgms.length===0}}" class="empty">空空如也</view>
+      <scroll-view wx:else class="list" scroll-y>
+        <view bindtap="chooseBgm" class="list-item" wx:for="{{myBgms}}" wx:key="item">
+          <view data-index="{{index}}" bindtap="{{options.chosenAndBack?'':'goPlayBgm'}}" class="title single-line">{{item.title}}</view>
+          <view class="flex-between btns">
+            <view bindtap="deleteBGM" class="btn warn" data-index="{{index}}">删除</view>
+          </view>
+        </view>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
+</view>

@@ -2,7 +2,9 @@
 
 
 .container {
-  /* background-color: chartreuse; */
+  height: 100vh;
+  background-color: #2c3e50;
+  color: #FFF;
 }
 
 .vtitle {
@@ -14,10 +16,9 @@
 }
 
 .vdesc {
-  color: #555;
   margin: 10px 0;
 }
 
 .info {
-  color: #555;
+  text-indent: 1em;
 }

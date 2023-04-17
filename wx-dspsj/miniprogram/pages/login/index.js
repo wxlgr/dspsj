@@ -53,7 +53,7 @@ Page({
       });
       setTimeout(() => {
         wx.reLaunch({
-          url: '../index/index'
+          url: '../mine/index'
         })
       }, 1000)
     }
