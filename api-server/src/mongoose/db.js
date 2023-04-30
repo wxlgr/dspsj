@@ -1,8 +1,7 @@
+const mongoose = require("mongoose");
 
-const mongoose = require('mongoose');
+mongoose
+  .connect("mongodb://127.0.0.1:27017/dspsj",)
+  .then(() => console.log("mongooDB Connected!"));
 
-mongoose.connect('mongodb://127.0.0.1:27017', {
-    dbName: 'dspsj'
-}).then(() => console.log('mongooDB Connected!'));
-
-module.exports = mongoose
+module.exports = mongoose;

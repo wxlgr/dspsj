@@ -50,7 +50,6 @@ const createAlbumFFTask = function (
   scene.setBgColor(bgColor);
 
 
-
   // 图集
 
   const album = new FFAlbum({
@@ -103,7 +102,7 @@ const createAlbumFFTask = function (
   });
 
   creator.on('complete', e => {
-    console.log(colors.magenta(`FFCreator completed: \n USEAGE: ${e.useage} \n PATH: ${e.output} `));
+    console.log(colors.magenta(`FFCreator completed:\n PATH: ${e.output} `));
 
   });
   return creator;

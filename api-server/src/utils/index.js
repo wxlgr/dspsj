@@ -32,12 +32,11 @@ function removeFile(fpath) {
     }
     fs.unlinkSync(fpath);
     resolve(`文件删除成功`);
-    console.log(`${fpath} 删除成功`)
+    // console.log(`${fpath} 删除成功`)
     
-
     if (fs.readdirSync(dir).length === 0) {
       fs.rmdirSync(dir);
-      console.log(`空文件夹 ${dir}已删除`);
+      // console.log(`空文件夹 ${dir}已删除`);
     }
   });
 }

@@ -7,7 +7,7 @@
   <swiper circular bindchange="bgmSwiperChange" current="{{currentIndex}}" class="bgm-list">
     <!-- bgm列表 -->
     <swiper-item>
-      <view  bindtap="chooseBgm" wx:for="{{bgmList}}" wx:key="title" class="bgm flex-between">
+      <view bindtap="chooseBgm" wx:for="{{bgmList}}" wx:key="title" class="bgm flex-between">
         <view data-index="{{index}}" bindtap="{{options.chosenAndBack?'':'goPlayBgm'}}" class="title single-line">{{item.title}}</view>
         <view class="btns">
           <text class="process">{{item.progressText||'00:00'}}</text>
@@ -26,7 +26,10 @@
       <scroll-view wx:else class="list" scroll-y>
         <view bindtap="chooseBgm" class="list-item" wx:for="{{myBgms}}" wx:key="item">
           <view data-index="{{index}}" bindtap="{{options.chosenAndBack?'':'goPlayBgm'}}" class="title single-line">{{item.title}}</view>
-          <view class="flex-between btns">
+          <view class="btns">
+            <view bindtap="changeBgmName" class="btn" data-index="{{index}}">修改名称</view>
+          </view>
+          <view class="btns">
             <view bindtap="deleteBGM" class="btn warn" data-index="{{index}}">删除</view>
           </view>
         </view>

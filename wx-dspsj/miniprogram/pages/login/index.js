@@ -2,11 +2,23 @@
 import md5 from 'md5'
 import api from '../../api/index'
 Page({
-  data: {},
+  data: {
+    // 处于登录、注册
+    isLogin: true,
+  },
   // 加载时
-  onLoad: (params) => {},
-  // 登陆事件
-  doLogin: function (event) {
+  onLoad: (params) => {
+
+  },
+  // 切换登录、注册
+  toggleIsLogin() {
+    this.setData({
+      isLogin: !this.data.isLogin
+    })
+  },
+
+  // 提交表单，进行登录或者注册
+  submitForm: function (event) {
     let {
       username,
       password
@@ -15,23 +27,29 @@ Page({
     username = username.trim()
     password = password.trim()
     // 简单验证
-    if (username == "" || password == "") {
+    if (username === "" || password === "") {
       return wx.showToast({
         title: '用户名或密码不能为空',
-        icon: 'none',
-        duration: 2000
+        icon: 'none'
       })
     }
-    // 请求后端登陆
-    this.login({
+    const {
+      isLogin
+    } = this.data
+    let obj = {
       username,
       password: md5(password)
-    })
+    }
+    // 请求后端登陆获注册
+    if (isLogin) {
+      this.login(obj)
+    } else {
+      this.register(obj)
+    }
 
   },
   async login(userObj) {
     const data = await api.login(userObj)
-    console.log(data)
     let {
       token
     } = data
@@ -44,7 +62,7 @@ Page({
         avatarPath
       } = data.result;
       //保存
-      getApp().globalData.logined = true
+      getApp().uid = _id
       wx.setStorageSync('token', token);
       wx.setStorageSync('userInfo', {
         _id,
@@ -62,11 +80,12 @@ Page({
       icon: data.code === 0 ? 'success' : 'error'
     })
   },
-
-  // 跳转到注册页事件
-  goRegistPage: function () {
-    wx.redirectTo({
-      url: '../regist/index',
+  async register(userObj) {
+    const data = await api.register(userObj)
+    wx.showToast({
+      title: data?.msg,
+      icon: data?.code === 0 ? 'success' : 'error'
     })
-  }
+  },
+
 });

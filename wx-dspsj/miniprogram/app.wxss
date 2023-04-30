@@ -7,6 +7,7 @@ view {
 }
 
 image {
+  display: block;
   width: 100%;
   height: 100%;
 }
@@ -18,7 +19,6 @@ video {
 page {
   background-color: whitesmoke;
 }
-
 
 .shadwbtn {
   box-sizing: border-box;
@@ -59,41 +59,34 @@ page {
   box-shadow: 1px 1px 6px 1px #ff6700;
 }
 
-
-.vtitle,.title {
+.vtitle,
+.title {
   flex: 1;
   padding: 10rpx;
-  text-decoration: underline;
 }
+
 .btns {
-  /* min-width: 40%; */
   text-align: center;
   display: flex;
   justify-content: space-evenly;
 }
-.btns view {
+
+.btns view,
+.btns .btn {
   border: 1px solid #ccc;
   border-radius: 8rpx;
   padding: 5rpx 6rpx;
   margin-left: 10rpx;
-}
-.editBtn,
-.findBtn {
   background-color: #fff;
 }
+
 .deleteBtn,
 .warn,
+.btn.warn,
 .cancel {
   color: red;
 }
 
-/* 隔行线 */
-.line {
-  width: 100%;
-  height: 1px;
-  background-color: gainsboro;
-  margin-top: 1px;
-}
 
 /* 单行显示
 */
@@ -102,6 +95,16 @@ page {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* 两行显示 */
+.two-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
 }
 
 /* 三行显示 */
@@ -129,6 +132,7 @@ page {
   content: '~~~';
 }
 
+/* 页面固定定位居中 */
 .page-center {
   /* background-color: darkred; */
   width: 100%;
@@ -150,6 +154,7 @@ page {
   background: rgba(0, 0, 0, .5);
 }
 
+/* 对话框 */
 .modal {
   position: relative;
   border-radius: 30rpx;
@@ -159,6 +164,7 @@ page {
 }
 
 .modal-top {
+  height: 60rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -215,19 +221,36 @@ textarea {
   max-height: 200rpx;
 }
 
+
+/* 简写类 */
 .flex-center {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.flex {
+.flex-column {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .flex-between {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.flex-around {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.flex-evenly {
+  display: flex;
+  justify-content: space-evenly;
   align-items: center;
 }
 
@@ -241,4 +264,19 @@ textarea {
 
 .pd20 {
   padding: 20rpx;
+}
+
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+/* 清除浮动 */
+.clearfix::after {
+  display: block;
+  content: '';
+  clear: both;
 }

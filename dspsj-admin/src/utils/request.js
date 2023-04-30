@@ -22,8 +22,6 @@ const errorHandle = (status, info) => {
     }
 }
 
-
-
 const instance = axios.create({
     timeout: 5000,
     baseURL:config.baseApi
@@ -67,7 +65,7 @@ function request(options) {
 
 // 扩展requet.get(),request.post()等
 
-['get', 'post', 'put', 'delete'].forEach(method => {
+['get', 'post'].forEach(method => {
     request[method] = (url, data) => request({
         url,
         method,

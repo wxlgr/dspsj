@@ -4,7 +4,7 @@
   </view>
 
   <view class='form'>
-    <form bindsubmit='doLogin'>
+    <form bindsubmit='submitForm'>
       <!-- 账号 -->
       <view class='inputView'>
         <view class="input-label">
@@ -19,14 +19,16 @@
           <image src='../../assets/images/password.png'></image>
           <label>密码</label>
         </view>
-        <input name='password' value='' class='inputText' password='true' placeholder='请输入密码'></input>
+        <input name='password' class='inputText' password='true' placeholder='请输入密码'></input>
       </view>
       <!-- 按钮 -->
       <view>
-        <button class='submitBtn' type='primary' form-type='submit'>登陆</button>
+        <button class='submitBtn' type='primary' form-type='submit'>{{isLogin?"登录":"注册"}}</button>
       </view>
       <view>
-        <button class="goBtn" type='warn' bindtap='goRegistPage'>没有账号？点击注册</button>
+        <button class="goBtn" type='warn' bindtap='toggleIsLogin'>{{
+          isLogin?'没有账号？点击注册':'返回登录'
+        }}</button>
       </view>
     </form>
   </view>

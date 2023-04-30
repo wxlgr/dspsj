@@ -1,0 +1,35 @@
+<!--pages/report/index.wxml-->
+<!-- 视频内容举报 -->
+<block wx:if="{{reportReasons.length>0}}">
+  <form class="report-form" bindsubmit="submitReport">
+    <radio-group name='report' bindchange="reportReasonChange">
+      <view class="reason-item" wx:for="{{reportReasons}}" wx:key="id">
+        <view class="radio flex-between"> <label for="{{item.id}}">{{item.title}}</label>
+          <radio data-inedx="{{index}}" color="red" name='reason' id="{{item.id}}" value="{{item.id}}" />
+        </view>
+
+        <!-- 侵犯权益一直显示 -->
+        <view class="qinfan single-line" wx:if="{{item.id==='qinfan'}}">{{item.desc}}</view>
+        <!-- 原因说明 -->
+        <view wx:else hidden="{{index!==activeIndex}}" class="info three-line">{{item.desc}}</view>
+      </view>
+    </radio-group>
+    <button disabled="{{activeIndex===-1}}" class="btn" form-type="submit">提交</button>
+  </form>
+</block>
+<!-- 视频播放反馈 -->
+<block wx:else="{{videoPlayQuestions.length>0}}">
+  <form class="report-form" bindsubmit="submitVideoPlayFeedback">
+    <radio-group name='feedback' bindchange="videoPlayQuestionsChange">
+      <view class="reason-item" wx:for="{{videoPlayQuestions}}" wx:key="id">
+        <view class="radio flex-between"> <label for="{{item.id}}">{{item.title}}</label>
+          <radio data-inedx="{{index}}" color="red" name='reason' id="{{item.id}}" value="{{item.id}}" />
+        </view>
+        <!-- 原因说明 -->
+        <textarea value="{{othersText}}" bindinput="othersTextInputHanlde" wx:if="{{item.id==='others'&&index===activeIndex}}" class="three-line">{{item.desc}}</textarea>
+      </view>
+    </radio-group>
+    <!-- 没有选择反馈的问题 或者选中了其他建议但是没有输入文本 -->
+    <button disabled="{{activeIndex<0||(activeIndex===videoPlayQuestions.length-1&&!othersText)}}" class="btn" form-type="submit">提交</button>
+  </form>
+</block>

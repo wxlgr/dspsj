@@ -146,7 +146,41 @@ Page({
       this.getMyBgms()
     }
   },
+  // 修改bgm名称
+  async changeBgmName(e) {
+    const index = +e.target.dataset.index
+    const {
+      myBgms
+    } = this.data
+    const bgm = myBgms[index]
 
+    let {
+      content: newTitle
+    } = await wx.showModal({
+      title: '修改bgm名称',
+      content: bgm.title,
+      editable: true,
+      placeholderText: ''
+    })
+    if (newTitle) {
+      newTitle = newTitle.trim()
+      bgm.title = newTitle
+      // ui跟新
+      this.setData({
+        myBgms
+      })
+      //数据库更改
+      const {
+        code,
+        msg
+      } = await api.updateBgm(bgm)
+      wx.showToast({
+        icon: code === 0 ? 'success' : 'error',
+        title: msg,
+      })
+    }
+
+  },
   // 删除bgm
   async deleteBGM(e) {
 
@@ -156,8 +190,6 @@ Page({
     if (res.cancel) {
       return
     }
-
-
     const index = +e.target.dataset.index
     const {
       myBgms
@@ -236,8 +268,12 @@ Page({
     if (!this.data.options.chosenAndBack || prePage.__route__ !== "pages/uploadVideo/index") {
       return
     }
-    const {currentIndex,myBgms,bgmList}  =this.data
-    const bgms = currentIndex===0?bgmList:myBgms
+    const {
+      currentIndex,
+      myBgms,
+      bgmList
+    } = this.data
+    const bgms = currentIndex === 0 ? bgmList : myBgms
     const index = +e.target.dataset.index
     prePage.setData({
       bgm: bgms[index]

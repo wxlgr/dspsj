@@ -2,7 +2,7 @@
 <view class="page-center">
   <view class="container">
     <view class="music-info">
-      <view class="title">{{bgm.title}}</view>
+      <view class="title single-line">{{bgm.title}}</view>
     </view>
     <view class="music-player">
       <slider value="{{percent}}" bindchanging="bindchanging" 

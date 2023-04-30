@@ -1,0 +1,81 @@
+[{
+  "_id": {
+    "$oid": "644d2b0a53d88b111a42c69a"
+  },
+  "author": {
+    "$oid": "644d1f7c5bbaf14a532c6a41"
+  },
+  "title": "鼓舞人心激励前进.mp3",
+  "bgmPath": "static/uploads/bgms/20230429/202304292234_64631853.mp3",
+  "createdAt": {
+    "$date": "2023-04-29T14:34:50.281Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T14:34:50.281Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "644d2b0f53d88b111a42c69e"
+  },
+  "author": {
+    "$oid": "644d1f7c5bbaf14a532c6a41"
+  },
+  "title": "轻快活泼.mp3",
+  "bgmPath": "static/uploads/bgms/20230429/202304292234_51091987.mp3",
+  "createdAt": {
+    "$date": "2023-04-29T14:34:55.657Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T14:34:55.657Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "644d2b1253d88b111a42c6a2"
+  },
+  "author": {
+    "$oid": "644d1f7c5bbaf14a532c6a41"
+  },
+  "title": "清新欢乐.mp3",
+  "bgmPath": "static/uploads/bgms/20230429/202304292234_26611623.mp3",
+  "createdAt": {
+    "$date": "2023-04-29T14:34:58.762Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T14:34:58.762Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "644d2b1553d88b111a42c6a6"
+  },
+  "author": {
+    "$oid": "644d1f7c5bbaf14a532c6a41"
+  },
+  "title": "乌云-董唧唧.mp3",
+  "bgmPath": "static/uploads/bgms/20230429/202304292235_48905489.mp3",
+  "createdAt": {
+    "$date": "2023-04-29T14:35:01.531Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T14:35:01.531Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "644d2b1853d88b111a42c6aa"
+  },
+  "author": {
+    "$oid": "644d1f7c5bbaf14a532c6a41"
+  },
+  "title": "喜庆-喜洋洋.mp3",
+  "bgmPath": "static/uploads/bgms/20230429/202304292235_55034002.mp3",
+  "createdAt": {
+    "$date": "2023-04-29T14:35:04.431Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T14:35:04.431Z"
+  },
+  "__v": 0
+}]

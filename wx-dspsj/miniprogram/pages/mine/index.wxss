@@ -35,9 +35,9 @@ page {
 }
 
 .nick-name {
-  width: 120rpx;
+  width: 196rpx;
   color: #fff;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
 }
 
@@ -54,8 +54,6 @@ page {
   padding: 10px;
 }
 
-
-
 /* 获赞、关注、粉丝数目 */
 .counts {
   width: 80%;
@@ -71,31 +69,9 @@ page {
   font-size: 14px;
 }
 
-.counts view {
+.counts view,
+.counts navigator {
   margin-right: 10px;
-}
-
-.tabs {
-  display: flex;
-  align-items: center;
-  background-color: #F5F5F5;
-}
-
-.tabs .tab {
-  flex: 1;
-  text-align: center;
-  font-size: 14px;
-  padding: 5px;
-  color: #777;
-}
-
-/* 选中的tab */
-.tabs .tab.active {
-  color: #000;
-  font-weight: bold;
-  border-radius: 5px;
-  /* background-color: #fff; */
-  box-shadow: 1px 1px 6px 1px #ff6700;
 }
 
 /* tab对应的内容容器 */
@@ -114,36 +90,33 @@ page {
 .list {
   height: 100%;
 }
+
 .list-item {
   max-width: 100%;
-  margin: 10rpx 0;
+  margin: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.vtitle,.title {
-  flex: 1;
+/* 视频封面与标题 */
+.vinfo {
+  max-width: 60%;
+}
+.vcover {
+  width: 200rpx;
+  height: 100rpx;
+}
+.vtitle,
+.title {
   padding: 10rpx;
-  text-decoration: underline;
 }
-.btns {
-  /* min-width: 40%; */
-  text-align: center;
-  display: flex;
-  justify-content: space-evenly;
+.btns{
+  min-width: 40%;
 }
-.btns view {
-  border: 1px solid #ccc;
-  border-radius: 8rpx;
-  padding: 5rpx 6rpx;
-  margin-left: 10rpx;
-}
-.editBtn,
-.findBtn {
-  background-color: #fff;
-}
-.deleteBtn,
-.cancel {
-  color: red;
+
+.opt {
+  width: 200rpx;
+  color: purple;
+  font-size: 14px;
 }

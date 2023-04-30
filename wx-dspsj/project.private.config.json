@@ -77,13 +77,6 @@
         },
         {
           "name": "",
-          "pathName": "pages/regist/index",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "",
           "pathName": "pages/uploadVideo/index",
           "query": "",
           "launchMode": "default",
@@ -113,6 +106,34 @@
         {
           "name": "",
           "pathName": "pages/bgm/index",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/report/index",
+          "query": "vid=64473b44f7d947e4a1306d98",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/report/index",
+          "query": "vid=64473b44f7d947e4a1306d98",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/follow/index",
+          "query": "tab=follows",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/updateUser/index",
           "query": "",
           "launchMode": "default",
           "scene": null

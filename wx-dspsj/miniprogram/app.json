@@ -3,11 +3,13 @@
     "pages/login/index",
     "pages/index/index",
     "pages/mine/index",
-    "pages/regist/index",
     "pages/uploadVideo/index",
-    "pages/playVideo/index",
     "pages/bgm/index",
-    "pages/playBgm/index"
+    "pages/playBgm/index",
+    "pages/report/index",
+    "pages/updateUser/index",
+    "pages/follow/index",
+    "pages/HisHome/index"
   ],
   "window": {
     "backgroundColor": "#f5f5f5",

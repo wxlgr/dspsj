@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="bg">
+    <image bindtap="previewBg" src="{{bgUrl}}" mode="" />
+  </view>
+  <view class="main">
+    <view class="avatar">
+      <view class="avatar-img">
+        <image src="{{avatarUrl||avatarDefault}}" />
+        <i class="iconfont icon-camera_fill"></i>
+      </view>
+    </view>
+    <!-- 获赞、关注、粉丝 -->
+    <view class="info">
+      <view class="gender">性别：{{userInfo.gender.isPublic?userInfo.gender.value:'保密'}}</view>
+      <view class="birthday">生日：{{userInfo.birthday.isPublic?userInfo.birthday.value:'保密'}}</view>
+    </view>
+    <view class="counts">
+      <view><strong>{{userInfo.star}}</strong> 获赞</view>
+      <view><strong>{{userInfo.followsCount}}</strong> 关注</view>
+      <view><strong>{{userInfo.fansCount}}</strong> 粉丝</view>
+    </view>
+    <!-- 作品 -->
+    <view class="works">
+      <view class="h3">公开作品：</view>
+      <view wx:if="{{works.length===0}}" class="empty">空空如也</view>
+      <block wx:else>
+        <scroll-view class="list" scroll-y>
+          <view class="list-item flex-between" wx:for="{{works}}" wx:key="item">
+            <view class="vinfo flex-between">
+              <view data-index="{{index}}" bindtap="preViewVideos" class="vcover">
+                <image src="{{baseUrl+item.coverPath}}" mode="" />
+              </view>
+              <view class="vtitle single-line">
+                {{item.title}}
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </block>
+    </view>
+  </view>
+</view>

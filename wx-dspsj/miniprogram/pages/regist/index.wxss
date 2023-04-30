@@ -1,3 +1,0 @@
-/* 导入公用样式 */
-@import '../../assets/css/login_register.wxss'
-

@@ -1,13 +1,13 @@
 <!-- 顶部用户信息 -->
 <view class="user">
-  <image src="../../assets/images/bg.png" />
+  <image bindtap="preViewBg" src="{{bgUrl}}" />
   <view class="userInfo">
     <view class="avatar" bindtap="changeAvatar">
       <image src="{{avatarUrl||avatarDefault}}"></image>
     </view>
     <view class="name-id" wx:if="{{logined}}">
-      <view class="nick-name single-line">{{userInfo.username}}</view>
-      <view class="uid single-line">_id：{{userInfo._id}}</view>
+      <view bindtap="changeNickname" class="nick-name single-line">{{userInfo.nickname?userInfo.nickname:userInfo.username}}</view>
+      <!-- <view class="uid single-line">_id：{{userInfo._id}}</view> -->
     </view>
     <view wx:else>
       <button size="mini" type="primary" bindtap="goLogin">去登陆</button>
@@ -18,14 +18,15 @@
 <view class="main-box" wx:if="{{logined}}">
   <!-- 获赞、关注、粉丝 -->
   <view class="counts">
-    <view bindtap="getStarHandle"><strong>{{myStarCount}}</strong> 获赞</view>
-    <view bindtap="followHandle"><strong>{{myFollowCount}}</strong> 关注</view>
-    <view bindtap="fansHandle"><strong>{{myFansCount}}</strong> 粉丝</view>
+    <view bindtap="getStarHandle"><strong>{{userInfo.star}}</strong> 获赞</view>
+    <navigator url="../follow/index?tab=follows"><strong>{{userInfo.followsCount}}</strong> 关注</navigator>
+    <navigator url="../follow/index?tab=fans"><strong>{{userInfo.fansCount}}</strong> 粉丝</navigator>
   </view>
   <!-- 上传作品、注销登录按钮 -->
   <view class="flex-between  mb20 mt20">
     <view class="shadwbtn" bindtap="goVideoUpload">上传作品</view>
     <view class="shadwbtn" bindtap="goBGM">bgm列表</view>
+    <navigator url="../" class="shadwbtn" bindtap="updateUser">编辑资料</navigator>
     <view class="shadwbtn warn" bindtap="logout">注销</view>
   </view>
   <!-- tabs -->
@@ -35,13 +36,19 @@
   <!-- tab content -->
   <view class="content">
     <swiper circular class="tab-swiper" current="{{activeTabIndex}}" bindchange="tabSwiperChange">
+      <!-- 作品 -->
       <swiper-item class="swiper-item">
         <view wx:if="{{myWorks.length===0}}" class="empty">空空如也</view>
         <block wx:else>
           <scroll-view class="list" scroll-y>
-            <view class="list-item" wx:for="{{myWorks}}" wx:key="item">
-              <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
-                {{item.title}}
+            <view class="list-item flex-between" wx:for="{{myWorks}}" wx:key="item">
+              <view class="vinfo flex-between">
+                <view data-index="{{index}}" bindtap="preViewVideos" class="vcover">
+                  <image src="{{baseUrl+item.coverPath}}" mode="" />
+                </view>
+                <view class="vtitle single-line">
+                  {{item.title}}
+                </view>
               </view>
               <view class="btns">
                 <view class="editBtn" data-index="{{index}}" bindtap="openModal">编辑</view>
@@ -52,13 +59,19 @@
           </scroll-view>
         </block>
       </swiper-item>
+      <!-- 私密 -->
       <swiper-item class="swiper-item">
         <view wx:if="{{mySecrets.length===0}}" class="empty">空空如也</view>
         <block wx:else>
           <scroll-view class="list" scroll-y>
             <view class="list-item" wx:for="{{mySecrets}}" wx:key="item">
-              <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
-                {{item.title}}
+              <view class="vinfo flex-between">
+                <view data-index="{{index}}" bindtap="preViewVideos" class="vcover">
+                  <image src="{{baseUrl+item.coverPath}}" mode="" />
+                </view>
+                <view class="vtitle single-line">
+                  {{item.title}}
+                </view>
               </view>
               <view class="btns">
                 <view class="editBtn" data-index="{{index}}" bindtap="openModal">编辑</view>
@@ -69,13 +82,19 @@
           </scroll-view>
         </block>
       </swiper-item>
+      <!-- 喜欢 -->
       <swiper-item class="swiper-item">
         <view wx:if="{{myLikes.length===0}}" class="empty">空空如也</view>
         <block wx:else>
           <scroll-view class="list" scroll-y>
             <view class="list-item" wx:for="{{myLikes}}" wx:key="item">
-              <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
-                {{item.title}}
+              <view class="vinfo flex-between">
+                <view data-index="{{index}}" bindtap="preViewVideos" class="vcover">
+                  <image src="{{baseUrl+item.coverPath}}" mode="" />
+                </view>
+                <view class="vtitle single-line">
+                  {{item.title}}
+                </view>
               </view>
               <!-- 本人作品才可操作 -->
               <view class="btns">
@@ -88,13 +107,19 @@
           </scroll-view>
         </block>
       </swiper-item>
+      <!-- 收藏 -->
       <swiper-item class="swiper-item">
         <view wx:if="{{myCollects.length===0}}" class="empty">空空如也</view>
         <block wx:else>
           <scroll-view class="list" scroll-y>
             <view class="list-item" wx:for="{{myCollects}}" wx:key="item">
-              <view class="vtitle single-line" data-index="{{index}}" bindtap="goVideoPlayer">
-                {{item.title}}
+              <view class="vinfo flex-between">
+                <view data-index="{{index}}" bindtap="preViewVideos" class="vcover">
+                  <image src="{{baseUrl+item.coverPath}}" mode="" />
+                </view>
+                <view class="vtitle single-line">
+                  {{item.title}}
+                </view>
               </view>
               <view class="btns">
                 <view class="findBtn" data-index="{{index}}" data-justlook="{{true}}" bindtap="openModal">查看</view>
@@ -122,6 +147,19 @@
       <view class='input-item'>
         <label>title:</label>
         <input disabled="{{modal.justlook}}" type="text" name='vtitle' value="{{video_Chosen.title}}" />
+      </view>
+      <view class='input-item'>
+        <label>封面:</label>
+        <view class="vcover">
+        <!-- 使用本地还是服务器 -->
+          <image src="{{video_Chosen.tempFilePath}}" />
+          <!-- 隐藏的文本框，用以记录视频封面问你就路径 -->
+          <input name='cover' hidden type="text" value="{{video_Chosen.tempFilePath}}"/>
+        </view>
+        <view class="opt flex-between">
+          <view bindtap="preViewCover" class="preview">预览</view>
+          <view wx:if="{{!modal.justlook}}" bindtap="changeCover" class="change">修改</view>
+        </view>
       </view>
       <view class='input-item'>
         <label>desc:</label>

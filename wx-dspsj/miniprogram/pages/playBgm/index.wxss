@@ -7,10 +7,16 @@ page{
   width: 100%;
 }
 .title{
+  font-weight: bold;
+  margin:  20px auto;
   text-align: center;
-  font-size: 50rpx;
-  margin: 20rpx;
-  color: rgb(226, 194, 14);
+  text-decoration: none;
+  background-color: #fff;
+  color: #ff6700;
+  border-radius: 10rpx;
+  max-width: 60%;
+  font-size: 16px;
+  text-decoration: none;
 }
 
 .music-player {

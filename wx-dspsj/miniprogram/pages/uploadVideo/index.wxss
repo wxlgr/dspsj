@@ -1,22 +1,54 @@
 /* pages/uploadVideo/index.wxss */
 @import '../../myiconfont/iconfont.wxss';
 
-
-.preview{
+.preview {
   margin: 20rpx 0;
 }
-.bgm{
+
+.vcover {
+  font-size: 14px;
+  color: #777;
+}
+.cover-img{
+  width: 300rpx;
+  height: 200rpx;
+  margin-top: 10rpx;
+  border: 1px solid #ccc;
+}
+.vsize {
+  max-width: 50%;
+  margin-left: 10px;
+}
+.vsize .compare{
+  font-size: 16px;
+  color: #555;
+  word-break: break-all;
+}
+.compare .now{
+  font-size: 16px;
+  color: blue;
+  word-break: break-all;
+}
+
+.vbox {
+  background-color: aliceblue;
+  margin: 30rpx 0;
+}
+
+.bgm {
   font-size: 14px;
   text-decoration: underline;
 }
 
-.photos{
+.photos {
   margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
 }
-.photo,.add{
-  width:30%;
+
+.photo,
+.add {
+  width: 30%;
   margin: 10rpx;
   height: 200rpx;
   border-radius: 5px;
@@ -24,13 +56,15 @@
   overflow: hidden;
   position: relative;
 }
-.add{
+
+.add {
   background-color: #fff;
   font-size: 3em;
   color: #999;
   font-weight: bold;
 }
-.photo .remove{
+
+.photo .remove {
   width: 50rpx;
   height: 50rpx;
   text-align: center;
@@ -40,9 +74,25 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
 }
 
+.progess::before {
+  position: fixed;
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  /* background-color: rgb(180, 180, 202); */
+  height: 100vh;
+  width: 100vh;
+}
 
+.progess {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 20rpx;
+}
 
-
+.progess progress {
+  width: 100%;
+  color: #fff;
+}

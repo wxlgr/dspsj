@@ -2,11 +2,13 @@ const mongoose = require("../db");
 
 const videoSchema = new mongoose.Schema(
   {
-    title: { type: String, default:'' },
+    title: { type: String, default: "" },
     //作者 关联User: usersModel
     author: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
     //描述
     desc: { type: String, default: "" },
+    // 视频封面
+    coverPath: { type: String, default: "" },
     // 视频背景音乐
     bgm: { type: mongoose.SchemaTypes.ObjectId, ref: "Bgm" },
 
@@ -26,7 +28,7 @@ const videoSchema = new mongoose.Schema(
         who: {
           type: Object,
           default: {
-            username: "",
+            nickname: "",
             avatarPath: "",
             _id: "",
           },

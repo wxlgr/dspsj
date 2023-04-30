@@ -5,6 +5,7 @@ const { linkUrls, uniqueSuffix, removeFile } = require("../utils");
 const moment = require("moment");
 const {
   baseUrl,
+  tempUploadFolder,
   videosUploadFolder,
   avatarsUploadFolder,
   photosUploadFolder,
@@ -27,6 +28,7 @@ function createFolder(folder) {
 
 // 创建文件
 function initFolders() {
+  createFolder(tempUploadFolder);
   createFolder(videosUploadFolder);
   createFolder(avatarsUploadFolder);
   createFolder(photosUploadFolder);
@@ -53,7 +55,7 @@ function createMulterStorage(uploadFolder) {
       const suffix = uniqueSuffix(8);
       //文件, 后缀
       const { ext } = path.parse(file.originalname);
-      let dateStr = moment().format("YYYYMMDDhhmm_");
+      let dateStr = moment().format("YYYYMMDDHHmm_");
       // 文件名
       let fname = dateStr + suffix + ext;
       cb(null, fname);
@@ -65,15 +67,29 @@ function createMulterStorage(uploadFolder) {
  * 视频，头像，bgm单文件上传
  */
 let singleFileUploads = [
+  // 临时文件夹
+  {
+    url: "/temp",
+    upload: multer({ storage: createMulterStorage(tempUploadFolder) }),
+    field: "temp",
+  },
+  // 存放视频作品
   {
     url: "/video",
     upload: multer({ storage: createMulterStorage(videosUploadFolder) }),
     field: "video",
   },
+
   {
     url: "/avatar",
     upload: multer({ storage: createMulterStorage(avatarsUploadFolder) }),
     field: "avatar",
+  },
+  // 背景图,封面图
+  {
+    url: "/photo",
+    upload: multer({ storage: createMulterStorage(photosUploadFolder) }),
+    field: "photo",
   },
   {
     url: "/bgm",
@@ -109,12 +125,14 @@ singleFileUploads.forEach((item) => {
   );
 });
 
-//图册
+//图册临时多照片上传
 
-let photosUpload = multer({ storage: createMulterStorage(photosUploadFolder) });
+let tempPhotosUpload = multer({
+  storage: createMulterStorage(tempUploadFolder),
+});
 uploadRouter.post(
   "/photos",
-  photosUpload.array("photos", 6),
+  tempPhotosUpload.array("photos", 6),
   function (req, res, next) {
     req.acceptsCharsets = "utf8";
     res.charset = "utf8";
@@ -142,7 +160,7 @@ uploadRouter.post(
 // 删除文件
 
 uploadRouter.post("/delete", async function (req, res) {
-  const {filePath} = req.body;
+  const { filePath } = req.body;
   try {
     const result = await removeFile(filePath);
     res.send({

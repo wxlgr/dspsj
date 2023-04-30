@@ -18,12 +18,7 @@ const videosApi = {
   findVideosByConditions(videoConditions) {
     return request.post('/videos/find', videoConditions)
   },
-  /**
-   * 查询所有公开视频
-   */
-  findAllPublicVideos() {
-    return request.get('/videos/findAllPublic')
-  },
+
   /**
    * 分页查询公开视频
    */
@@ -31,6 +26,10 @@ const videosApi = {
     pageIndex: 1,
     pageSize: 5
   }) {
+    Object.assign({
+      pageIndex: 1,
+      pageSize: 5
+    }, pageOptions)
     return request.get('/videos/findByPage', pageOptions)
   },
   /**
@@ -78,20 +77,38 @@ const videosApi = {
   },
   /**
    * 制作影集
-   * @param {*} photos 
+   * @param {*} obj 
    */
-  makeAlbums(obj={
-    bgmUrl:'',
-    photoUrls:[]
+  makeAlbums(obj = {
+    bgmUrl: '',
+    photoUrls: [],
+    addText: ''
   }) {
     return request.post('/videos/makeAlbums', obj)
   },
+  /**
+   * 给视频添加bgm
+   * @param {*} options 
+   */
   makeVideo(options = {
     videoUrl: '',
     bgmUrl: ''
   }) {
-    return request.post('/videos/makeVideo',options)
+    return request.post('/videos/makeVideo', options)
+  },
+  /**
+   * 获得视频举报的原因列表
+   */
+  getReportReasons() {
+    return request.get('/videos/reportReasons')
+  },
+  /**
+   * 获得视频播放反馈问题的问题
+   */
+  getVideoPlayQuestions() {
+    return request.get('/videos/playQuestions')
   }
+
 }
 
 export {

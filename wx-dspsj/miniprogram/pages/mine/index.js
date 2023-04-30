@@ -2,10 +2,14 @@ import {
   checkAuth
 } from '../../utils/checkAuth'
 import api from '../../api/index';
+import utils from '../../utils/chooseAndUploadPic'
 Page({
   data: {
+    bgUrl: '',
     // 默认头像
     avatarDefault: '../../assets/images/noneface.png',
+    // 默认背景图路径 在服务器
+    defaultBgPath: 'static/assets/bg.png',
     userInfo: null,
     // 访问基本地址
     baseUrl: '',
@@ -13,9 +17,6 @@ Page({
     avatarUrl: '',
     logined: false,
     //
-    myFansCount: 11,
-    myFollowCount: 12,
-    myStarCount: 13,
     tabList: [{
         id: 'works',
         // 对应的视频数组
@@ -44,7 +45,6 @@ Page({
       }
     ],
     activeTabIndex: 0, //默认选中tab
-    allVideos: [], //所有视频，未过滤
 
     myWorks: [],
     mySecrets: [],
@@ -60,28 +60,73 @@ Page({
       justlook: false
     },
     // 在操作的视频
-    video_Chosen: {}
+    video_Chosen: {
+      tempFilePath: ''
+    }
   },
   onLoad: async function () {
-    if (!await checkAuth()) {
-      return this.goLogin()
+    if (!checkAuth()) {
+      return wx.redirectTo({
+        url: '../login/index',
+      })
     }
-    this.getUserInfo()
-    this.getMyWorks()
+    await this.getUserInfo()
+    await this.getMyWorks()
   },
   async onShow() {
-    if (!await checkAuth()) {
-      return this.goLogin()
-    }
-    this.getMyWorks()
+    const {
+      activeTabIndex,
+      tabList
+    } = this.data
+    const getMyXXXs = tabList[activeTabIndex].fn
+    await this.getUserInfo()
+    // 执行对应tab的刷新获取数据函数
+    await this[getMyXXXs]()
+  },
+  // 下拉刷新
+  async onPullDownRefresh() {
+    wx.showNavigationBarLoading()
+    this.onShow()
+    await wx.showToast({
+      icon: 'none',
+      title: '刷新成功',
+    })
+    wx.stopPullDownRefresh()
+    wx.hideNavigationBarLoading()
+
   },
 
-  // 跳转登录页
-  goLogin() {
-    wx.redirectTo({
-      url: '../login/index',
+  // 预览背景图
+  preViewBg() {
+    wx.previewImage({
+      urls: [this.data.bgUrl],
     })
   },
+  // 预览视频
+  preViewVideos(e) {
+    let index = +e.currentTarget.dataset.index
+    const {
+      baseUrl,
+      activeTabIndex,
+      tabList
+    } = this.data
+    // myWorks mySecrets myLikes myCollects
+    const myXXXs = tabList[activeTabIndex].videos
+    const videos = this.data[myXXXs]
+    const sources = videos.map(video => {
+      return {
+        url: baseUrl + video.videoPath,
+        type: 'video',
+        poster: baseUrl + video.coverPath
+      }
+    })
+    wx.previewMedia({
+      sources,
+      current: index
+    })
+  },
+
+
   // 跳转bgm管理页面
   goBGM() {
     wx.navigateTo({
@@ -103,57 +148,90 @@ Page({
         icon: 'error'
       })
     }
-    // 选择图片并上传
-    const res = await wx.chooseMedia({
-      mediaType: "image",
-      count: 1
+    const r = await wx.showModal({
+      title: '修改头像?',
     })
-    const tempPath = res.tempFiles[0].tempFilePath
-    const {result} = await api.uploadFile(tempPath, "avatar")
-    // 相对路径path，访问地址url
-    const {
-      path,
-      url
-    } = result
+    // 取消上传
+    if (r.cancel) return
+    // 选择图片并上传
+    const result = await utils.chooseAndUploadPic('avatar')
+    if (!result.path) return
     // 数据库更新 需传入用户id
     const {
       userInfo,
     } = this.data;
-    const updatedUser = await api.updateUser({
+    await api.updateUser({
       _id: userInfo._id,
-      avatarPath: path,
+      avatarPath: result.path,
     })
-    // 删除旧文件
-    const removeFile = await api.deleteFile(userInfo.avatarPath)
-    if (updatedUser && removeFile) {
-      wx.showToast({
-        title: '更换成功',
-      })
-    }
     // 更新显示头像
     this.setData({
-      avatarUrl: url,
-      'userInfo.avatarPath': path
+      avatarUrl: result.url,
+      'userInfo.avatarPath': result.path
     })
+    wx.showToast({
+      title: '更换头像成功',
+    })
+    // 删除旧文件
+    await api.deleteFile(userInfo.avatarPath)
+  },
+  // 修改昵称
+  async changeNickname() {
+    const {
+      userInfo: user
+    } = this.data
+    let oldNickName = user.nickname
+    const r = await wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      content: oldNickName,
+      placeholderText: "请输入新的昵称"
+    })
+    if (r.cancel) return;
+    let newNickname = r.content.trim()
+    if (!newNickname) {
+      return wx.showToast({
+        title: '新昵称不能为空'
+      })
+    } else if (oldNickName === newNickname) {
+      return wx.showToast({
+        icon: 'none',
+        title: '新旧昵称不能一样'
+      })
+    }
+    await api.updateUser({
+      _id: user._id,
+      nickname: newNickname
+    })
+    wx.showToast({
+      title: '昵称修改成功'
+    })
+    this.getUserInfo()
 
+  },
+  // 跳转编辑资料
+  updateUser() {
+    wx.navigateTo({
+      url: '../updateUser/index?uid=' + this.data.userInfo._id,
+    })
   },
 
   //获取用户基本信息
   async getUserInfo() {
-    console.log('获取用户信息');
+    // console.log('获取用户信息');
+    const uid = getApp().uid
+    const baseUrl = getApp().globalData.baseUrl
+    if (!uid) return
     const {
       result
-    } = await api.getUserInfo(getApp().uid)
-    if (result) {
-      const baseUrl = getApp().globalData.baseUrl
-      this.setData({
-        logined: true,
-        userInfo: result,
-        baseUrl,
-        avatarUrl: result.avatarPath ? baseUrl + result.avatarPath : ''
-      })
-
-    }
+    } = await api.getUserInfo(uid)
+    this.setData({
+      bgUrl: result.bgPath ? baseUrl + result.bgPath : baseUrl + this.data.defaultBgPath,
+      logined: true,
+      userInfo: result,
+      baseUrl,
+      avatarUrl: result.avatarPath ? baseUrl + result.avatarPath : ''
+    })
   },
 
   //获取作品列表
@@ -168,7 +246,7 @@ Page({
     } = await api.findUserWorks(uid)
     // console.log(result);
     this.setData({
-      myWorks: result
+      myWorks: result.reverse()
     })
   },
   //获取私密作品表
@@ -180,9 +258,8 @@ Page({
     const {
       result
     } = await api.findUserSecretWorks(userInfo._id)
-    console.log(result);
     this.setData({
-      mySecrets: result
+      mySecrets: result.reverse()
     })
   },
 
@@ -193,13 +270,11 @@ Page({
       userInfo
     } = this.data
     const {
-      result: videos
+      result
     } = await api.findUserLikes(userInfo._id)
-    console.log(videos);
     this.setData({
-      myLikes: videos
+      myLikes: result.reverse()
     })
-
   },
   // 获取我的收藏
   async getMyCollects() {
@@ -207,25 +282,11 @@ Page({
     const {
       userInfo
     } = this.data
-    // 解构并重命名
     const {
-      result: videos
+      result
     } = await api.findUserCollects(userInfo._id)
-    if (videos) {
-      this.setData({
-        myCollects: videos
-      })
-    }
-  },
-  // 跳转播放详情页
-  goVideoPlayer(e) {
-    const index = +e.target.dataset.index;
-    const video = this.data.myWorks[index]
-    wx.navigateTo({
-      url: '../playVideo/index?index=' + index,
-      success: (res => {
-        res.eventChannel.emit("video", video)
-      })
+    this.setData({
+      myCollects: result.reverse()
     })
   },
   // 关闭模态框
@@ -243,86 +304,134 @@ Page({
     const justlook = e.target.dataset.justlook || false
     const {
       activeTabIndex,
-      tabList
+      tabList,
+      baseUrl
     } = this.data
     // 作品，私密，喜欢，收藏数组
     const myXXXs = tabList[activeTabIndex].videos
     const video = this.data[myXXXs][index]
-    console.log(video);
-    this.setData({
-      'modal.show': true,
-      'modal.justlook': justlook,
-      video_Chosen: video
+    // console.log(video);
+
+    // 先将封面图片缓存
+    wx.downloadFile({
+      url: baseUrl + video.coverPath,
+      success: res => {
+        if (res.statusCode === 200) {
+          video.tempFilePath = res.tempFilePath
+          this.setData({
+            'modal.show': true,
+            'modal.justlook': justlook,
+            video_Chosen: video,
+          })
+        }
+      }
     })
 
+
+  },
+  // 编辑框中修改视频封面
+  async changeCover() {
+    try {
+      const file = (await wx.chooseMedia()).tempFiles[0]
+      if (file.fileType !== 'image') {
+        return wx.showToast({
+          title: '请选择图片文件',
+          icon: 'error'
+        })
+      }
+      const {
+        video_Chosen
+      } = this.data
+
+      video_Chosen.tempFilePath = file.tempFilePath
+      console.log(file.tempFilePath);
+      this.setData({
+        video_Chosen
+      })
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  // 预览封面
+  preViewCover() {
+    const {
+      baseUrl,
+      video_Chosen
+    } = this.data
+    wx.previewImage({
+      urls: [video_Chosen.tempFilePath],
+    })
   },
   //模态框 提交修改视频信息
   async submitVideo(e) {
     let {
       vtitle,
       vdesc,
-      isPublic
+      isPublic,
+      cover
     } = e.detail.value
     vtitle = vtitle.trim()
     vdesc = vdesc.trim()
+    if (vtitle==='') {
+      return wx.showToast({
+        title: '标题不能为空!',
+        icon:'error'
+      })
+    }
     const {
       result
-    } = await api.updateVideo({
+    } = await api.uploadFile(cover, 'photo')
+    await api.updateVideo({
       _id: this.data.video_Chosen._id,
       title: vtitle,
       desc: vdesc,
+      coverPath: result.path,
       isPublic
     })
-    if (result) {
-      wx.showToast({
-        title: '编辑成功',
-      })
-    }
+    wx.showToast({
+      title: '编辑成功',
+    })
     // 关闭模态框
     this.closeModal()
+    // 刷新数据
+    this.onShow()
+  },
+  //在作品、私密中删除视频
+  async deleteVideo(e) {
+    const r = await wx.showModal({
+      title: '确认删除此视频？',
+    })
+    if (r.cancel) return;
+    const index = +e.target.dataset.index
     const {
       activeTabIndex,
-      tabList
+      tabList,
     } = this.data
-    let getMyXXX = tabList[activeTabIndex].fn
-    // 执行对应tab的刷新获取数据函数
-    this[getMyXXX]()
-  },
-  //删除视频
-  deleteVideo(e) {
-    const index = +e.target.dataset.index
-    const video = this.data.myWorks[index]
-    wx.showModal({
-      title: '确认删除此视频？',
-      success: (async res => {
-        if (res.confirm) {
+    // myWorks / mySecrets
+    const myXXXs = tabList[activeTabIndex].videos
 
-          // 数据库删除
-          const {
-            result
-          } = await api.deleteVideo({
-            _id: video._id,
-          })
-          // 删除文件
-          const {
-            code
-          } = await api.deleteFile(video.videoPath)
-          if (result && code === 0) {
-            console.log(result);
-            wx.showToast({
-              title: '删除成功',
-            })
-            this.getMyWorks()
-          }
-        }
-      })
+    // 当前的视频
+    const video = this.data[myXXXs][index]
+    // 数据库删除
+    await api.deleteVideo({
+      _id: video._id,
     })
-
-
+    // 删除文件
+    await api.deleteFile(video.videoPath)
+    await api.deleteFile(video.coverPath)
+    wx.showToast({
+      title: '删除成功',
+    })
+    // 刷新数据
+    this.onShow()
   },
 
   // 点击移除喜欢/收藏
-  cancelLikeOrCollect(e) {
+  async cancelLikeOrCollect(e) {
+    const r = await wx.showModal({
+      title: '确认从此列表移除？'
+    })
+    if (r.cancel) return;
     // myLikes/myCollects中的视频下标
     const vIndex = +e.target.dataset.index
     const {
@@ -330,122 +439,78 @@ Page({
       tabList,
       userInfo
     } = this.data
-    // 保存喜欢、收藏视频的数组名称 'myLikes'/'myCollects'
-    const myXXX = tabList[activeTabIndex].videos
-    // user表中的对应的喜爱/收藏数组字段: lieks/collects
-    const fieldInUserSchema = tabList[activeTabIndex].id
-    // videos表中的对应的被喜爱、收藏数目字段: lieks/collects
-    // user:likes[]对应 video:star  user:collects对应video:collect
-    const fieldInVideoSchema = fieldInUserSchema === 'likes' ? 'star' : 'collect'
-    //移除喜欢时 myLikes likes star
-    //移除收藏时 myCollects collects collect
-    // return console.log(myXXX,fieldInUserSchema,fieldInVideoSchema)
-    console.log(myXXX, fieldInUserSchema, fieldInVideoSchema)
-    // 视频列表 
-    const myXXXArr = this.data[myXXX]
-    // 喜欢、收藏视频列表的第几个视频
-    const video = myXXXArr[vIndex]
-    // console.log(fieldInVideoSchema, video[fieldInVideoSchema]);
+    // 刷新数据的方法，tab的id
+    const {
+      id: tabId,
+      // myLikes myCollects
+      videos: myXXXs
+    } = tabList[activeTabIndex]
 
-    wx.showModal({
-      title: '确认从此列表移除？'
-    }).then(async res => {
-      if (res.confirm) {
-        // 对应视频star/collect数目减一
-        video[fieldInVideoSchema] -= 1
+    const video = this.data[myXXXs][vIndex]
 
-        //user表 likes/collects数组中 移除对应视频vid
-        // 找到vid在对应数组的下标
-        const i = userInfo[fieldInUserSchema].findIndex(vid => vid === video._id)
-        userInfo[fieldInUserSchema].splice(i, 1)
-
-        // ui 更新
-        // 移除myLikes/myCollects中的视频元素 ，这样视图即更新，不必重新请求刷新
-        myXXXArr.splice(vIndex, 1)
-        this.setData({
-          [myXXX]: myXXXArr
-        })
-
-        // 数据库更新
-        const {
-          result: newUser
-        } = await api.updateUser({
-          _id: userInfo._id,
-          // likes /collects 喜爱/收藏数组
-          [fieldInUserSchema]: userInfo[fieldInUserSchema]
-        })
-        const {
-          result: newVideo
-        } = await api.updateVideo(video)
-        if (newUser && newVideo) {
-          wx.showToast({
-            title: '移除成功',
-          })
-        }
-      }
+    // 当前是喜欢tab，移除喜欢
+    if (tabId === 'likes') {
+      api.unLikeVideo(userInfo._id, video._id)
+    } else if (tabId === 'collects') {
+      // 当前收藏tab，取消收藏
+      api.unCollectVideo(userInfo._id, video._id)
+    }
+    wx.showToast({
+      title: '移除成功',
     })
-
+    //刷新数据
+    this.onShow()
   },
 
   //点击注销
   logout() {
-    const that = this;
     wx.showModal({
       title: '确定退出登录？',
       success: (res => {
         if (res.confirm) {
-          that.setData({
-            userInfo: {},
-            logined: false
-          })
-          //
           wx.clearStorage()
-          wx.navigateTo({
+          wx.redirectTo({
             url: '../login/index',
           })
         }
       })
     })
-
-
   },
-
-
+  // 点击查看获赞
+  getStarHandle() {
+    wx.showToast({
+      icon: 'none',
+      title: this.data.userInfo.star + ' 获赞',
+    })
+  },
+  // 点击查看关注
+  followHandle() {
+    wx.showToast({
+      icon: 'none',
+      title: this.data.userInfo.followsCount + ' 关注',
+    })
+  },
   //点击查看粉丝情况
   fansHandle() {
     wx.showToast({
       icon: 'none',
-      title: this.data.myFansCount + '粉丝',
-    })
-  },
-  followHandle() {
-    wx.showToast({
-      icon: 'none',
-      title: this.data.myFollowCount + '关注',
-    })
-  },
-  getStarHandle() {
-    wx.showToast({
-      icon: 'none',
-      title: this.data.myStarCount + '获赞',
+      title: this.data.userInfo.fansCount + ' 粉丝',
     })
   },
   // 点击tab
   clickTab(e) {
-    const index = +e.target.dataset.index;
     this.setData({
-      activeTabIndex: index,
+      activeTabIndex: +e.target.dataset.index,
     })
   },
-
   // tab 滚动
   tabSwiperChange(e) {
     const index = +e.detail.current
     this.setData({
       activeTabIndex: index,
     })
-    let tabFn = this.data.tabList[index].fn
-    //调用对应的tab方法
-    this[tabFn]();
+    let getMyXXXs = this.data.tabList[index].fn
+    //调用对应的tab方法,刷新数据
+    this[getMyXXXs]();
   }
 })

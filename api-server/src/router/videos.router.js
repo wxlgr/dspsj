@@ -3,91 +3,101 @@ const videosRouter = new require("express").Router();
 const { videosModel, usersModel } = require("../mongoose/models/index");
 const { createVideoGgmFFTask } = require("../ff/videoBgm");
 const { createAlbumFFTask } = require("../ff/album");
-const { startFFTask, FFCreatorCenter } = require("../ff/index");
+const { FFCreatorCenter, startFFTask } = require("../ff/index");
 const path = require("path");
 
 const { baseUrl } = require("../config/app.config");
 
-const ffoutPath = baseUrl + "/static/ffout/";
-const { removeFile } = require("../utils/index");
+const ffoutPath = "static/ffout/";
 
-// 视频加工
-videosRouter.post("/makeVideo", async (req, res) => {
-  try {
-    const { videoUrl, bgmUrl } = req.body;
+const wss = require("../router/ws");
 
-    const taskId = startFFTask(() =>
-      createVideoGgmFFTask({
-        videoPath: videoUrl,
-        bgmPath: bgmUrl,
+// 推送
+function sendTaskProgress(ws, taskId) {
+  let timer = setInterval(() => {
+    const percent = (FFCreatorCenter.getProgress(taskId) * 100) >> 0;
+    ws.send(
+      JSON.stringify({
+        type: "progress",
+        data: percent,
+      })
+    );
+  }, 1000);
+
+  // 制作完成
+  FFCreatorCenter.onTaskComplete(taskId, (result) => {
+    ws.send(
+      JSON.stringify({
+        type: "progress",
+        data: 100,
       })
     );
 
-    FFCreatorCenter.onTaskComplete(taskId, (result) => {
-      const ffFileUrl = ffoutPath + path.parse(result.file).base;
-      res.send({
-        code: 0,
-        msg: "视频加工完成",
-        result: ffFileUrl,
-      });
-    });
+    const baseName = path.parse(result.file).base;
+    const url = baseUrl + "/" + ffoutPath + baseName;
+    const filePath = ffoutPath + baseName;
+    ws.send(
+      JSON.stringify({
+        type: "complete",
+        data: {
+          url,
+          path: filePath,
+        },
+      })
+    );
+    clearInterval(timer);
+    ws.close();
+  });
+}
 
-    // 错误
-    FFCreatorCenter.onTaskError(taskId, (error) => {
-      res.send({
-        code: 1,
-        msg: "未知错误！",
-        result: null,
-      });
-    });
-  } catch (error) {
-    console.log(error.message);
+// 获取视频制作进度
+wss.on("connection", (ws) => {
+  ws.on("message", (data) => {
+    // 返回发来的消息
+    const obj = JSON.parse(data.toString());
 
-    res.send({
-      code: 1,
-      msg: "未知错误！",
-      result: null,
-    });
-  }
+    // ws.send(data.toString());
+    if (obj.type === "progress") {
+      // 推送任务状态
+      sendTaskProgress(ws, obj.taskId);
+    }
+  });
+});
+
+// 视频加工,添加任务
+videosRouter.post("/makeVideo", async (req, res) => {
+  const { videoUrl, bgmUrl } = req.body;
+  const taskId = startFFTask(() =>
+    createVideoGgmFFTask({
+      videoPath: videoUrl,
+      bgmPath: bgmUrl,
+    })
+  );
+  res.send({
+    code: 0,
+    msg: "任务执行中",
+    taskId,
+  });
 });
 
 // 制作图册
 videosRouter.post("/makeAlbums", async (req, res) => {
-  try {
-    let { bgmUrl, photoUrls } = req.body;
+  let { bgmUrl, photoUrls, addText = "" } = req.body;
 
-    const taskId = startFFTask(() =>
-      createAlbumFFTask({
-        imgs: photoUrls,
-        bgm: bgmUrl,
-      })
-    );
-
-    FFCreatorCenter.onTaskComplete(taskId, (result) => {
-      const ffFileUrl = ffoutPath + path.parse(result.file).base;
-      res.send({
-        code: 0,
-        msg: "制作图册完成",
-        result: ffFileUrl,
-      });
-    });
-
-    // 错误
-    FFCreatorCenter.onTaskError(taskId, (error) => {
-      res.send({
-        code: 1,
-        msg: "未知错误！",
-        result: null,
-      });
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.send({
-      code: 1,
-      msg: "未知错误！",
-      result: null,
-    });
-  }
+  const taskId = startFFTask(() =>
+    createAlbumFFTask({
+      imgs: photoUrls,
+      bgm: bgmUrl,
+      txt: {
+        title: addText,
+      },
+    })
+  );
+  res.send({
+    code: 0,
+    msg: "任务执行中",
+    taskId,
+  });
 });
 
 // 视频新增
@@ -149,30 +159,7 @@ videosRouter.post("/delete", async (req, res) => {
   });
 });
 
-// 获取所有公开的视频
-//  并填充 author：根据uid返回具体User 要select username，不要_id
-videosRouter.get("/findAllPublic", async function (req, res) {
-  try {
-    const videos = await videosModel
-      .find({
-        isPublic: true,
-      })
-      .populate("author", "username avatarPath");
-    res.send({
-      code: 0,
-      result: videos,
-      msg: "查询成功",
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.send({
-      code: 1,
-      msg: "未知错误！",
-      result: null,
-    });
-  }
-});
-// 获取用户的作品
+// 获取用户的公开作品
 videosRouter.get("/findUserWorks/:uid", async function (req, res) {
   try {
     const uid = req.params.uid;
@@ -180,8 +167,9 @@ videosRouter.get("/findUserWorks/:uid", async function (req, res) {
     const videos = await videosModel
       .find({
         author: uid,
+        isPublic: true,
       })
-      .populate("author", "username avatarPath");
+      .populate("author", "username nickname avatarPath");
     res.send({
       code: 0,
       result: videos,
@@ -299,6 +287,15 @@ videosRouter.post("/find", async function (req, res) {
   }
 });
 
+// 获得视频总数
+videosRouter.get("/getVideosCount", async function (req, res) {
+  const totalCount = await videosModel.count();
+  res.send({
+    code: 0,
+    result: totalCount,
+    msg: "查询成功",
+  });
+});
 // video分页查询
 videosRouter.get("/findByPage", async function (req, res) {
   try {
@@ -310,9 +307,15 @@ videosRouter.get("/findByPage", async function (req, res) {
 
     const totalCount = await videosModel.count();
     const list = await videosModel
-      .find()
+      .find({
+        isPublic: true,
+      })
       .skip((pageIndex - 1) * pageSize)
-      .limit(pageSize);
+      .limit(pageSize)
+      .sort({
+        createdAt: "desc",
+      })
+      .populate("author", "username nickname avatarPath fans fansCount");
 
     res.send({
       code: 0,
@@ -320,7 +323,7 @@ videosRouter.get("/findByPage", async function (req, res) {
         // 总数
         totalCount,
         // 总页数
-        totolSize: Math.ceil(totalCount / pageSize),
+        totalSize: Math.ceil(totalCount / pageSize),
         // 当前返回列表项数目
         listCount: list.length,
         // 第几页
@@ -375,6 +378,26 @@ videosRouter.post("/update", async function (req, res) {
       result: null,
     });
   }
+});
+
+// 返回视频举报原因列表数据
+videosRouter.get("/reportReasons", function (req, res) {
+  const { reportReasons } = require("./data/reportReasons");
+  res.send({
+    code: 0,
+    msg: "查询成功",
+    result: reportReasons,
+  });
+});
+
+// 返回视频播放反馈原因列表数据
+videosRouter.get("/playQuestions", function (req, res) {
+  const { videoPlayQuestions } = require("./data/videoPlayQuestions");
+  res.send({
+    code: 0,
+    msg: "查询成功",
+    result: videoPlayQuestions,
+  });
 });
 
 module.exports = videosRouter;

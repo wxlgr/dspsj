@@ -1,7 +1,7 @@
-import api from '../api/index'
-async function checkAuth() {
-  const data = await api.getUserInfo(getApp().uid)
-  return data.code !== 401
+function checkAuth() {
+  const uid = wx.getStorageSync('userInfo')._id
+  getApp().uid=uid
+  return !!uid
 }
 export {
   checkAuth

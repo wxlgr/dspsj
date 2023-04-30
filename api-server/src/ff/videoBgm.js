@@ -1,13 +1,6 @@
 const ffConfig = require("./ff.config");
 const colors = require("colors");
-const {
-  FFScene,
-  FFAudio,
-  FFVideo,
-  FFText,
-  FFImage,
-  FFCreator,
-} = require("ffcreator");
+const { FFScene, FFAudio, FFVideo, FFCreator } = require("ffcreator");
 const { getVideoDurationInSeconds } = require("get-video-duration");
 
 const width = ffConfig.width,
@@ -22,14 +15,12 @@ const createVideoGgmFFTask = async function ({
   const creator = new FFCreator(ffConfig);
   const scene = new FFScene();
   scene.setBgColor(bgColor);
-
   const video = new FFVideo({
     path: videoPath,
     width,
-    height: 380,
+    height,
     x: width / 2,
     y: height / 2,
-    volume: false,
   });
 
   if (bgmPath) {
@@ -37,8 +28,9 @@ const createVideoGgmFFTask = async function ({
       path: bgmPath,
       volume: 1,
     });
+
     // 去除原声
-    video.setAudio(false);
+    // video.setAudio(false);
     scene.addAudio(bgm);
   }
 
@@ -47,26 +39,8 @@ const createVideoGgmFFTask = async function ({
   scene.addChild(video);
   creator.addChild(scene);
 
-  // 开始渲染
   creator.start();
 
-  creator.on("start", () => {
-    console.log(`FFCreator start`);
-  });
-
-  creator.on("progress", (e) => {
-    console.log(
-      colors.yellow(`FFCreator progress: ${(e.percent * 100) >> 0}%`)
-    );
-  });
-
-  creator.on("complete", (e) => {
-    console.log(
-      colors.magenta(
-        `FFCreator completed: \n USEAGE: ${e.useage} \n PATH: ${e.output} `
-      )
-    );
-  });
   return creator;
 };
 

@@ -1,7 +1,15 @@
-const { FFCreatorCenter } = require('ffcreator')
-// 添加任务的函数
-function startFFTask(ffTaskFN) {
-    return FFCreatorCenter.addTask(ffTaskFN);
+const { FFCreatorCenter } = require("ffcreator");
+
+/**
+ * 
+ * @param {*} taskFn 
+ * @returns  [creator, taskId]
+ */
+function startFFTask(taskFn) {
+  return FFCreatorCenter.addTask(()=>taskFn());
 }
 
-module.exports = { startFFTask, FFCreatorCenter }
+module.exports = {
+  startFFTask,
+  FFCreatorCenter
+};

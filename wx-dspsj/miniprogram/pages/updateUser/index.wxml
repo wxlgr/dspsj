@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="bg">
+    <image bindtap="previewBg" src="{{bgUrl}}" mode="" />
+    <view class="bg-tip flex-between" bindtap="changeBg">
+      <i class="iconfont icon-cameraadd"></i>
+      <text>更换背景</text>
+    </view>
+  </view>
+  <view class="main">
+    <view bindtap="changeAvatar" class="avatar flex-column">
+      <view class="avatar-img">
+        <image src="{{avatarUrl||avatarDefault}}" />
+        <i class="iconfont icon-camera_fill"></i>
+      </view>
+      <view class="avatar-tip">点击更换头像</view>
+    </view>
+    <view class="info">
+      <view bindtap="changeNickname" class="info-item flex-between">
+        <view class="label">昵称</view>
+        <view class="value single-line">{{userInfo.nickname}}</view>
+        <view class="arrow">></view>
+      </view>
+      <picker mode="selector" range="{{genderRange}}" bindchange='changeGender'>
+        <view class="info-item flex-between">
+          <view class="label">性别</view>
+          <view class="value single-line">{{userInfo.gender.value?userInfo.gender.value:'暂不设置'}} <strong class="isPublic">({{userInfo.gender.isPublic?'公开':'保密'}})</strong></view>
+          <view class="arrow">></view>
+        </view>
+      </picker>
+
+      <picker header-text="选择生日" mode="date" bindchange='changeBirthday'>
+        <view class="info-item flex-between">
+          <view class="label">生日</view>
+          <view class="value single-line">{{userInfo.birthday.value?userInfo.birthday.value:'暂不设置'}} <strong class="isPublic">({{userInfo.birthday.isPublic?'公开':'保密'}})</strong></view>
+          <view class="arrow">></view>
+        </view>
+      </picker>
+
+
+    </view>
+  </view>
+</view>

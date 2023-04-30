@@ -6,9 +6,17 @@ let userSchema = new mongoose.Schema(
     username: { type: String, require: true },
     password: { type: String, require: true },
     nickname: { type: String, default: "" },
-
+    // 背景图
+    bgPath: { type: String, default: "" },
     avatarPath: { type: String, default: "" },
-    gender: { type: String, default: "" },
+    gender: { type: Object, default: {
+      isPublic:false,
+      value:''
+    } },
+    birthday: { type: Object, default: {
+      isPublic:false,
+      value:''
+    } },
 
     // 角色
     // 默认普通用户 user

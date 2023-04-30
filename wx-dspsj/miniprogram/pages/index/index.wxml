@@ -1,78 +1,119 @@
 <!--pages/videos/index.wxml-->
-<swiper wx:if="{{videoList.length>0}}" class="myswiper" vertical bindchange="onMySwiperChange">
+<swiper wx:if="{{videoList.length>0}}" class="myswiper" vertical bindanimationfinish="bindanimationfinish" bindchange="onMySwiperChange">
   <block wx:for="{{videoList}}" wx:key="item">
     <swiper-item class="swiper-item">
       <!-- 编程式控制播放 -->
-      <video id="video{{index}}" src="{{item.videoUrl}}"  
-      object-fit="fill"
-      show-fullscreen-btn="{{false}}" enable-play-gesture loop></video>
+      <video id="video{{index}}" src="{{item.videoUrl}}" object-fit="fill" enable-play-gesture loop enable-auto-rotation></video>
       <!-- 图标按钮等 -->
       <block>
         <!--标题  -->
         <view class="vtitle single-line">{{item.title||'暂无标题'}}</view>
         <!-- @作者 -->
         <!-- 视频描述 -->
-        <view bindtap="clickAuthor" class="vauthor">@{{item.author.username}}</view>
-        <view class="vdesc three-line">{{item.desc||'暂无视频描述'}}</view>
-        <!-- 绝对定位的图标 -->
-        <view bindtap="downVideo" class="download">
-          <view class="iconfont icon-download"></view>
-        </view>
+        <view bindtap="clickAuthor" class="vauthor">@{{item.author.nickname?item.author.nickname:item.author.username}}</view>
+        <view class="vdesc two-line">{{item.desc||'暂无视频描述'}}</view>
+
       </block>
       <!-- 右侧定位图标 -->
       <view class="right-icons">
         <!-- 作者头像 -->
         <view class="icon-box avatar">
-          <image bindtap="clickAuthor" src="{{ item.author.avatarUrl||avatarDefault}}"></image>
+          <navigator open-type="{{item.author._id===userInfo._id?'switchTab':'navigate'}}" class="author-img" url="{{item.author._id===userInfo._id?'../mine/index':'../HisHome/index?uid='+item.author._id}}">
+            <image src="{{ item.author.avatarUrl||avatarDefault}}"></image>
+          </navigator>
+          <!-- 如果用户还没关注作者，并且作者不是用户本人 -->
+          <view wx:if="{{!item.meta.isAuthorFollowedByUser&&item.author._id!==userInfo._id}}" bindtap="followAuthor" class="follow-author"><i class="iconfont icon-add1"></i></view>
         </view>
         <!-- 喜欢 -->
         <view class="icon-box love">
-          <view class="iconfont icon-love {{item.meta.isUserLiked?'active':''}}" bindtap="clickLove"></view>
+          <view class="iconfont icon-love {{item.meta.isUserLiked?'active':''}}" bindtap="toggleLike"></view>
           <text>{{item.star}}</text>
         </view>
         <!-- 评论 -->
         <view class="icon-box comment">
           <view bindtap="clickComents" class="iconfont icon-comments"></view>
-          <text>{{item.comments.length}}</text>
+          <text>{{item.comments.length>0?item.comments.length:'抢首评'}}</text>
         </view>
         <!-- 收藏 -->
         <view class="icon-box collection">
-          <view class="iconfont icon-star-fill {{item.meta.isUserCollected?'active':''}}" bindtap="clickCollection"></view>
-          <text>{{item.collect}}</text>
+          <view class="iconfont icon-star-fill {{item.meta.isUserCollected?'active':''}}" bindtap="toggleCollect"></view>
+          <text>{{item.collect>0?item.collect:'收藏'}}</text>
         </view>
         <!-- 分享 -->
         <view class="icon-box share">
-          <view bindtap="shareVideo" class="iconfont icon-share">
+          <view bindtap="openShareModal" class="iconfont icon-share">
           </view>
-          <text>{{item.collection}}</text>
         </view>
       </view>
 
-      <!-- 留言区其他区域 点击用于关闭留言区-->
-      <view class="mask" wx:if="{{item.meta.isShowComments}}" bindtap="closeComments">
+      <!-- 留言模态框 -->
+      <view class="comment-modal" wx:if="{{item.meta.isShowComments}}">
+        <!-- 留言区其他区域 点击用于关闭留言区-->
+        <view class="mask" bindtap="closeComments">
+        </view>
+        <!-- 留言区 -->
+        <scroll-view scroll-y class="comment-box">
+          <!-- 留言评论 -->
+          <view class="header">
+            <input type="text" class="sayInput" model:value="{{mysay}}" placeholder="善语结善缘,恶语伤人心~" />
+            <button id="sendBtn" type="primary" size="mini" bindtap="doSay">发送</button>
+          </view>
+          <!-- 留言展示 -->
+          <view class="commentItem" wx:for="{{item.comments}}" wx:for-item="i" wx:key="i">
+            <view class="sayer-avatar">
+              <image src="{{baseUrl+i.who.avatarPath}}" />
+            </view>
+            <view class="content">
+              <text class="who single-line">{{i.who.nickname}} </text>
+              <view class="say">{{i.say}} </view>
+              <text class="time">{{i.when}}</text>
+              <view class="deleteBtn" wx:if="{{i.who._id==userInfo._id}}" data-comment-index="{{index}}" bindtap="deleteMysay">删除</view>
+            </view>
+          </view>
+        </scroll-view>
       </view>
-      <!-- 留言区 -->
-      <scroll-view scroll-y class="commentbox" wx:if="{{item.meta.isShowComments}}">
-        <!-- 留言评论 -->
-        <view class="header">
-          <input type="text" class="sayInput" model:value="{{mysay}}" placeholder="善语结善缘,恶语伤人心~" />
-          <button id="sendBtn" type="primary" size="mini" bindtap="doSay">发送</button>
-        </view>
-        <!-- 留言展示 -->
-        <view class="commentItem" wx:for="{{item.comments}}" wx:for-item="i" wx:key="i">
-          <view class="sayer-avatar">
-            <image src="{{baseUrl+i.who.avatarPath}}" />
-          </view>
-          <view class="content">
-            <text class="who">{{i.who.username}} </text>
-            <view class="say">{{i.say}} </view>
-            <text class="time">{{i.when}}</text>
-            <view class="deleteBtn" wx:if="{{i.who._id==userInfo._id}}" data-comment-index="{{index}}" bindtap="deleteMysay">删除</view>
-          </view>
-        </view>
-      </scroll-view>
-
     </swiper-item>
   </block>
 </swiper>
-<view wx:else>空空如也</view>
+<view wx:else class="empty">空空如也</view>
+
+<!-- 分享模态框 -->
+<view class="share-modal" wx:if="{{isShowShareModal}}">
+  <!-- 模态框其他区域 点击用于关闭留-->
+  <view class="mask" bindtap="closeShareModal">
+  </view>
+  <!-- 内容区 -->
+  <view class="share-box">
+    <view class="modal-top">
+      <view class="modal-close" bindtap="closeShareModal">x</view>
+    </view>
+    <view class="items">
+      <view class="item share" bindtap="doShareVideo">
+        <view class="icon"><i class="iconfont icon-shandian"></i></view>
+        <text>分享</text>
+      </view>
+      <view class="item download" bindtap="doDownVideo">
+        <view class="icon"><i class="iconfont icon-download"></i></view>
+        <text>保存本地</text>
+      </view>
+      <!-- 不是自己的作品才能举报：不能举报自己的视频 -->
+      <block wx:if="{{video_Chosen.author._id!==userInfo._id}}">
+        <navigator class="item report" url="../report/index?vid={{video_Chosen._id}}">
+          <view class="icon"><i class="iconfont icon-50jubao"></i></view>
+          <text>举报</text>
+        </navigator>
+      </block>
+      <!-- 播放反馈 -->
+      <navigator class="item feedback" url="../report/index?vid={{video_Chosen._id}}&feedback=true">
+        <view class="icon"><i class="iconfont icon-yijianfankui"></i></view>
+        <text>播放反馈</text>
+      </navigator>
+      <view bindtap="tobeDeveloped" class="item others">
+        <view class="icon"><i class="iconfont icon-ico_others"></i></view>
+        <text>待开发...</text>
+      </view>
+
+    </view>
+
+  </view>
+</view>

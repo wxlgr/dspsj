@@ -1,7 +1,9 @@
 @import '../../myiconfont/iconfont.wxss';
+
 .myswiper {
   height: 100vh;
   background-color: black;
+  overflow: scroll;
 }
 
 .swiper-item {
@@ -10,9 +12,12 @@
   align-items: center;
 }
 
-
+video {
+  height: 100%;
+}
 
 .vtitle {
+  text-align: center;
   background-color: #fff;
   border-radius: 10rpx;
   padding: 10rpx;
@@ -23,28 +28,28 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  max-width: 80%;
+  max-width: 50%;
   top: 30rpx;
+  text-decoration: none;
 }
 
 /*  */
 .vauthor,
-.vdesc,
-.download {
+.vdesc {
   position: absolute;
   color: #fff;
   left: 20rpx;
 }
 
-.download {
-  bottom: 500rpx;
-}
 
 .vauthor {
-  bottom: 200rpx;
+  bottom: 220rpx;
 }
+
 .vdesc {
-  bottom: 150rpx;
+  /* background-color: brown; */
+  height: 60px;
+  bottom:60rpx;
   max-width: 60%;
 }
 
@@ -57,7 +62,7 @@
 .right-icons {
   position: absolute;
   right: 20rpx;
-  bottom: 40rpx;
+  bottom: 86rpx;
   /* background-color: #ccc; */
   display: flex;
   flex-direction: column;
@@ -73,21 +78,41 @@
   /* overflow: hidden; */
 }
 
+/*  */
 .icon-box text {
-  font-size: 14px;
+  font-size: 12px;
   color: #fff;
 }
 
 .avatar {
+  margin-bottom: 40rpx;
+  position: relative;
+}
+.avatar .author-img{
   border: 2px solid #fff;
   width: 40px;
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 20px;
 }
 
-
+/* 关注作者图标 */
+.avatar .follow-author {
+  position: absolute;
+  bottom: -10px;
+  background-color: red;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.follow-author .iconfont{
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
 
 .icon-love.active {
   color: red;
@@ -100,13 +125,14 @@
 .mask {
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,.5);
-  position: absolute;
+  background: rgba(0, 0, 0, .5);
+  position: fixed;
   top: 0;
   left: 0;
 }
 
-.commentbox {
+.comment-box,
+.share-box {
   padding: 20rpx;
   box-sizing: border-box;
   position: absolute;
@@ -115,8 +141,7 @@
   width: 100%;
   height: 60%;
   overflow: auto;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-radius: 10px 10px 0 0;
   background-color: #fff;
   transition: all 0.2s;
 }
@@ -140,7 +165,6 @@
   border: 2px solid #ddd;
   margin-right: 20rpx;
 }
-
 
 .header {
   display: flex;
@@ -175,6 +199,8 @@
 
 .who {
   font-size: 32rpx;
+  width: 120rpx;
+  background-color: red;
 }
 
 .time {
@@ -202,3 +228,67 @@
   border-radius: 5px;
   align-self: flex-end;
 }
+
+.modal-top {
+  display: block;
+  border-bottom: 1px solid rgb(226, 218, 218);
+  margin-bottom: 10px;
+}
+
+.modal-close {
+  float: right;
+}
+
+.items {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.item {
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 图标 */
+.item .icon {
+  background-color: gold;
+  border-radius: 50%;
+  padding: 14rpx;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.download .icon {
+  background-color: mediumpurple;
+}
+.report .icon {
+  background-color: rgb(226, 55, 12);
+}
+.feedback .icon {
+  background-color: rgb(168, 147, 147);
+}
+.others .icon {
+  background-color: greenyellow;
+}
+
+/* 文字 */
+.item text {
+  color: #345;
+  font-size: 12px;
+}
+
+.items .iconfont {
+  font-size: 64rpx;
+}
+
+
+

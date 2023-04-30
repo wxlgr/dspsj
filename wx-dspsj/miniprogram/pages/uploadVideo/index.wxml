@@ -6,7 +6,7 @@
       </text>
     </view>
     <view class="choosePhotos">
-      <text class="shadwbtn" bindtap="choosePhotos">{{tempPhotosPath.length===0?'制作图片影集':'重新选图'}}
+      <text class="shadwbtn" bindtap="choosePhotos">{{tempPhotos.length===0?'制作图片影集':'重新选图'}}
       </text>
     </view>
   </view>
@@ -23,42 +23,76 @@
       <label>isPublic:</label>
       <switch checked name='isPublic' />
     </view>
-
-    <view class="flex-between">
-      <button wx:if="{{!bgm}}" size="mini" type="default" bindtap="goBGMPage">添加bgm</button>
-      <block wx:if="{{bgm}}">
+    <!-- 添加bgm -->
+    <view class="addBgm flex-between">
+      <button wx:if="{{(videoPath||tempPhotos.length>0)&&!bgm.bgmPath}}" size="mini" type="default" bindtap="goBGMPage">添加bgm</button>
+      <block wx:if="{{bgm.bgmPath}}">
         <view style="max-width:60%" bindtap="goBGMPage" wx:if="{{bgm.title}}" class="bgm single-line">{{bgm.title}}</view>
         <button size="mini" type="warn" bindtap="cancelBgm">取消</button>
       </block>
     </view>
+    <!-- 制作图片影集支持添加文字标题 -->
+    <view class="addText flex-between">
+      <button wx:if="{{(tempPhotos.length>0)&&!addText}}" size="mini" type="default" bindtap="addText">添加文字</button>
+      <block wx:if="{{addText}}">
+        <view style="max-width:60%" class="addText single-line">{{addText}}</view>
+        <button size="mini" type="warn" bindtap="cancelText">取消</button>
+      </block>
+    </view>
+    <!-- 加工视频 发布视频 -->
     <view class="flex-between">
-      <button size="mini" type="primary" bindtap="processVideo" hidden="{{!bgm||processed||tempPhotosPath.length>0}}">加工视频</button>
+      <button size="mini" type="primary" bindtap="processVideo" hidden="{{!bgm.bgmPath|| tempPhotos.length>0||processed}}">加工视频</button>
       <block>
-        <button size="mini" type="primary" bindtap="makeAlbums" wx:if="{{tempPhotosPath.length>0&&bgm&&!processed}}">一键成片</button>
+        <button size="mini" type="primary" bindtap="makeAlbums" wx:if="{{tempPhotos.length>0&&bgm.bgmPath&&!processed}}">一键成片</button>
       </block>
       <button size="mini" type="primary" form-type="submit" disabled="{{!canPublish}}">发布作品</button>
     </view>
     <!-- 预览区 -->
     <view class="preview">
       <view class="vshow" wx:if="{{videoPath!==''}}">
-        <video src="{{videoPath}}"  enable-play-gesture></video>
-        <view>
-          视频大小：{{video.size}}
+        <view class="vmeta clearfix">
+          <view class="vcover fl">
+            <view class="top clearfix">
+              <h3 class="fl">封面:</h3>
+              <view bindtap="chooseCover" class="change-cover warn fr">更换封面</view>
+            </view>
+            <view class="cover-img">
+              <image src="{{video.coverPath}}" />
+            </view>
+          </view>
+          <view class="vsize fl">
+            <h3> 视频大小：</h3>
+            <!-- 未加工或者是影集制作 -->
+            <view wx:if="{{!processed||tempPhotos.length>0}}">
+              {{video.size}}
+            </view>
+            <!-- 原视频添加bgm后的视频大小 -->
+            <view class="compare" wx:else>
+              <view class="pre">加工前{{video.size}}</view> ->
+              <view class="now">加工后{{video.processedSize}}</view>
+            </view>
+          </view>
         </view>
+        <view class="vbox">
+          <video src="{{videoPath}}" enable-play-gesture></video>
+        </view>
+
       </view>
-      <view class="p" wx:if="{{tempPhotosPath.length>0&&videoPath===''}}">
+      <view class="p" wx:if="{{tempPhotos.length>0&&videoPath===''}}">
         <view class="photos">
-          <view class="photo" wx:for="{{tempPhotosPath}}" wx:key="tempFilePath">
+          <view class="photo" wx:for="{{tempPhotos}}" wx:key="tempFilePath">
             <image src="{{item.tempFilePath}}" />
             <view data-index="{{index}}" bindtap="removePhoto" class="iconfont icon-remove remove"></view>
           </view>
-          <view wx:if="{{tempPhotosPath.length<6}}" class="add flex-center" bindtap="addPhotos">+</view>
+          <view wx:if="{{tempPhotos.length<6}}" class="add flex-center" bindtap="addPhotos">+</view>
         </view>
       </view>
     </view>
 
   </form>
+</view>
 
-
-
+<!-- 进度条 -->
+<view wx:if="{{showProgress}}" class="progess page-center">
+  <progress border-radius="5" stroke-width="10" percent="{{progress}}" show-info />
 </view>

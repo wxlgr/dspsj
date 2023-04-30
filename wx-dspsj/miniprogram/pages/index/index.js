@@ -1,9 +1,12 @@
 import {
   formatDate
 } from '../../utils/dateFormat'
+import {
+  checkAuth
+} from '../../utils/checkAuth'
 import api from '../../api/index'
 // 播放器
-let players = []
+let player = null
 
 Page({
   data: {
@@ -11,58 +14,57 @@ Page({
     baseUrl: '',
     userInfo: {},
     videoList: [], // 视频列表
+    // 第几页视频
+    pageIndex: 1,
+    totalCount: 0,
+    totalSize: 0,
     currentIndex: 0, //当前在播视频index
+    // 留言内容绑定
     mysay: '',
+
+    // 展示分享模态框
+    isShowShareModal: false,
+    // 在操作的视频
+    video_Chosen: {}
   },
 
   // 页面加载
-  onLoad: function (params) {
+  onLoad: async function (params) {
     this.setData({
       baseUrl: getApp().globalData.baseUrl,
     })
+    if (!checkAuth()) {
+      return wx.redirectTo({
+        url: '../login/index',
+      })
+    }
 
     //查询用户喜爱、收藏记录
-    this.getUserInfo()
+    await this.getUserInfo()
     //获取视频列表
-    this.getAllVideos()
-
+    await this.getVideosByPage()
+    // 播放第一个视频
+    player = wx.createVideoContext(`video0`)
+    player.play()
 
   },
-  onShow() {
-    //查询用户喜爱、收藏记录
-    this.getUserInfo()
-    //获取视频列表
-    this.getAllVideos()
-  },
-  // 下拉刷新
-  async onPullDownRefresh() {
-    wx.showNavigationBarLoading()
+  async onShow() {
     await this.getUserInfo()
     //查询用户喜爱、收藏记录
     //获取视频列表
-    await this.getAllVideos()
-    await wx.showToast({
-      icon: 'none',
-
-      title: '下拉加载成功',
-    })
-    wx.stopPullDownRefresh()
-    wx.hideNavigationBarLoading()
-
+    await this.getVideosByPage(1, true)
   },
-  // 上拉加载
-  async onReachBottom() {
-
-    wx.showToast({
-      title: '上拉加载成功',
-    })
-
+  // 离开时，关闭分享模态框
+  onHide() {
+    this.closeShareModal()
+    if (player) {
+      player.stop()
+    }
   },
 
   // 
   //获取用户基本信息
   async getUserInfo() {
-    console.log('获取用户信息');
     const uid = getApp().uid
     if (!uid) {
       return
@@ -70,23 +72,33 @@ Page({
     const {
       result
     } = await api.getUserInfo(uid)
-    if (result) {}
-    this.setData({
-      userInfo: result,
-    })
+    if (result) {
+      this.setData({
+        userInfo: result,
+      })
+    }
 
   },
   //获取视频列表
-  async getAllVideos() {
-    console.log('获取视频列表');
-    const allPublicVideos = await api.findAllPublicVideos()
-    console.log(allPublicVideos);
-    const videos = allPublicVideos.result || []
-
+  async getVideosByPage(pIndex = 1, refresh = false) {
     const {
+      result
+    } = await api.findPublicVideosByPage({
+      pageIndex: pIndex,
+      pageSize: 5
+    })
+    const videos = result.list
+    this.setData({
+      totalCount: result.totalCount,
+      totalSize: result.totalSize,
+    })
+    //  return  console.log(result);
+    let {
       baseUrl,
       avatarDefault,
-      userInfo
+      userInfo,
+      videoList,
+      pageIndex
     } = this.data
     // 给视频对象添加一些属性
     videos.map(video => {
@@ -96,49 +108,69 @@ Page({
       }
       // 修正视频地址
       video.videoUrl = baseUrl + video.videoPath
-
-      // 
       let meta = {
         //是否展示评论 默认不展示
         isShowComments: false,
         // 是否被用户喜欢、点赞
         isUserLiked: userInfo.likes.includes(video._id),
-        isUserCollected: userInfo.collects.includes(video._id)
+        // 是否被用户收藏
+        isUserCollected: userInfo.collects.includes(video._id),
+        // 视频作者是否被用户关注
+        isAuthorFollowedByUser: userInfo.follows.includes(video.author._id)
       }
       // 合并属性
       Object.assign(video, {
         meta
       })
     })
-    // console.log(videos[0]);
+    if (!refresh) {
+      videoList.push(...videos)
+    } else {
+      videoList = videos,
+        this.setData({
+          pageIndex: 1,
+          videoList
+        })
+    }
     this.setData({
-      videoList: videos.reverse(),
+      videoList
     })
 
-    // 初始化视频播放器数组
-    for (let i = 0; i < videos.length; i++) {
-      // 根据video id 创建媒体上下文
-      let temp = wx.createVideoContext(`video${i}`)
-      players.push(temp)
+  },
+  bindanimationfinish(e) {
+    const {
+      currentIndex,
+      videoList,
+      pageIndex,
+      totalSize
+    } = this.data
+    // 在最后一页触发了上拉
+    if (currentIndex === videoList.length - 1) {
+
+      if (pageIndex < totalSize) {
+        this.getVideosByPage(pageIndex + 1)
+        this.setData({
+          pageIndex: pageIndex + 1
+        })
+      } else {
+        wx.showToast({
+          icon: 'none',
+          title: '没有更多了',
+        })
+      }
     }
   },
-
   //滑动切换
   onMySwiperChange(e) {
-    const {
-      currentIndex
-    } = this.data
-    // 记录上一次的index
-    let oldIndex = currentIndex
-
     let newIndex = +e.detail.current
+    if (player) {
+      player.stop()
+    }
+    player = wx.createVideoContext(`video${newIndex}`)
+    player.play()
     this.setData({
       currentIndex: newIndex,
     })
-
-    // console.log(oldIndex,newIndex);
-    players[oldIndex].stop()
-    players[newIndex].play()
   },
 
   clickAuthor() {
@@ -153,115 +185,92 @@ Page({
     })
   },
 
-  //下载视频
-  downVideo() {
+  // 关注视频的作者
+  async followAuthor() {
     const {
+      currentIndex,
+      videoList,
+      userInfo
+    } = this.data
+    const video = videoList[currentIndex]
+
+    // 更新
+    video.meta.isAuthorFollowedByUser = true
+    this.setData({
+      videoList
+    })
+    // 数据库
+    const {
+      msg
+    } = await api.followSomeOne(userInfo._id, video.author._id)
+    wx.showToast({
+      title: msg,
+      icon: 'none'
+    })
+
+    // 重新获取视频信息
+    this.onShow()
+
+  },
+
+  //点击添加喜欢、收藏图标
+  async toggleLike() {
+    const {
+      userInfo: user,
       videoList,
       currentIndex
     } = this.data
     const video = videoList[currentIndex]
-    //
-    wx.showModal({
-      title: '确定下载该视频?',
-      success: (r => {
-        if (r.confirm) {
-          //下载
-          wx.downloadFile({
-            url: video.videoUrl,
-            success: (res => {
-              if (res.statusCode === 200) {
-                // 保存视频到相册
-                wx.saveVideoToPhotosAlbum({
-                  filePath: res.tempFilePath,
-                }).then(res => {
-                  wx.showToast({
-                    title: '下载成功',
-                  })
-                }).catch(err => {
-                  wx.showToast({
-                    icon: 'error',
-                    title: '已取消下载',
-                  })
-                })
-              }
-            })
-          })
-        }
-      })
-    })
-  },
-
-  // 统一处理点击喜欢或者点击收藏按钮的函数
-  async clickLikeOrCollect({
-    // 点击的时喜欢还是收藏
-    type = 'like',
-    // 对应videos表中的什么字段
-    videoField = 'star',
-    // meta中的是什么属性
-    metaKey = 'isUserLiked',
-    // 对应users表中那个数组
-    userField = 'likes'
-  }) {
-
+    // ui切换
+    video.meta.isUserLiked = !video.meta.isUserLiked
+    // 是否点亮
+    let flag = video.meta.isUserLiked
     const {
-      videoList,
-      currentIndex,
-      userInfo
-    } = this.data
-    const video = videoList[currentIndex]
-
-    // 修改ui对应data
-    video.meta[metaKey] = !video.meta[metaKey]
-    // 点击之后是否时激活
-    let flag = video.meta[metaKey]
-
-    // 点赞、收藏数目
-    video[videoField] += flag ? 1 : -1
-
-    if (flag) {
-      userInfo[userField].push(video._id)
-    } else {
-      let index = userInfo[userField].findIndex(item => item === video._id)
-      if (index > -1) {
-        //删除
-        userInfo[userField].splice(index, 1)
-      }
-    }
-
+      msg,
+      star,
+      likes
+    } = flag ? await api.likeVideo(user._id, video._id) : await api.unLikeVideo(user._id, video._id)
     wx.showToast({
-      icon: "none",
-      title: flag ? "添加成功" : "取消成功"
+      title: msg,
+      icon: 'none'
     })
-    // 显式改变
+    video.star = star
+    user.likes = likes
+    // 更新star,likes
     this.setData({
       videoList,
-      userInfo
-    })
-
-    // 数据库更新
-    const newUser = await api.updateUser(userInfo)
-    const newVideo = await api.updateVideo(video)
-    console.log(`视频${videoField}:`, newVideo.result[videoField])
-    console.log(`用户${userField}:`, newUser.result[userField])
-
-  },
-  //点击添加喜欢、收藏图标
-  async clickLove() {
-    this.clickLikeOrCollect({
-      type: 'like',
-      videoField: 'star',
-      metaKey: 'isUserLiked',
-      userField: 'likes'
+      userInfo: user
     })
   },
 
   // 点击收藏
-  async clickCollection() {
-    this.clickLikeOrCollect({
-      type: 'collect',
-      videoField: 'collect',
-      metaKey: 'isUserCollected',
-      userField: 'collects'
+  async toggleCollect() {
+    const {
+      userInfo: user,
+      videoList,
+      currentIndex
+    } = this.data
+    const video = videoList[currentIndex]
+    // ui切换
+    video.meta.isUserCollected = !video.meta.isUserCollected
+    // 是否点亮
+    let flag = video.meta.isUserCollected
+    const {
+      msg,
+      collect,
+      collects
+    } = flag ? await api.collectVideo(user._id, video._id) : await api.unCollectVideo(user._id, video._id)
+    console.log(msg,flag,user._id, video._id);
+    wx.showToast({
+      title: msg,
+      icon: 'none'
+    })
+    video.collect = collect
+    user.collects = collects
+    // 更新star,likes
+    this.setData({
+      videoList,
+      userInfo: user
     })
   },
   //点击蒙版，关闭评论区
@@ -308,7 +317,7 @@ Page({
     // ui
     const who = {
       _id: userInfo._id,
-      username: userInfo.username.substr(0, 4),
+      nickname: userInfo.nickname,
       avatarPath: userInfo.avatarPath
     }
     console.log(formatDate(Date.now()))
@@ -336,16 +345,32 @@ Page({
       })
     }
   },
-  // 点击分享按钮 真机调试
-  async shareVideo() {
+  // 打开分享模态框
+  openShareModal() {
     const {
       currentIndex,
       videoList
     } = this.data
     const video = videoList[currentIndex]
-    // 下载到本地
+
+    this.setData({
+      isShowShareModal: true,
+      video_Chosen: video
+    })
+
+
+  },
+  // 关闭分享模态框
+  closeShareModal() {
+    this.setData({
+      isShowShareModal: false
+    })
+  },
+  // 下载视频文件分享给微信好友
+  doShareVideo() {
+    //  下载到本地
     wx.downloadFile({
-      url: video.videoUrl,
+      url: this.data.video_Chosen.videoUrl,
       success: (async res => {
         // 转发到聊天
         await wx.shareVideoMessage({
@@ -353,7 +378,37 @@ Page({
         })
       })
     })
-
+  },
+  //下载视频
+  async doDownVideo() {
+    const {
+      video_Chosen
+    } = this.data
+    //
+    const r = await wx.showModal({
+      title: '确定下载该视频?',
+      content: video_Chosen.title,
+    })
+    if (r.confirm) {
+      //下载
+      wx.downloadFile({
+        url: video_Chosen.videoUrl,
+        success: (res) => {
+          if (res.statusCode === 200) {
+            // 保存视频到相册
+            wx.saveVideoToPhotosAlbum({
+              filePath: res.tempFilePath,
+            }).then(res => {
+              wx.showToast({
+                title: '下载成功',
+              })
+            }).catch(err => {
+              console.log(err);
+            })
+          }
+        }
+      })
+    }
   },
 
   //删除评论
@@ -392,6 +447,13 @@ Page({
       })
     })
   },
+// 待开发
+  tobeDeveloped(){
+    wx.showToast({
+      title: '待开发模块~',
+      icon:'none'
+    })
+  }
 
 
 });

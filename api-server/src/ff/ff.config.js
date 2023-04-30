@@ -10,7 +10,6 @@ const ffConfig = {
     audioLoop: true,          // 音乐循环
     threads: 8,               // 多线程(伪造)并行渲染
     render:'gl',
-    
 }
 
 module.exports = ffConfig

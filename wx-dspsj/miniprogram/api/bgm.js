@@ -13,6 +13,9 @@ const bgmsApi = {
   findUserBgms(uid) {
     return request.get('/bgms/findUserBgms/' + uid)
   },
+  updateBgm(bgmObj) {
+    return request.post('/bgms/update',bgmObj)
+  },
   deleteBgm(gid) {
     return request.post("/bgms/delete",{gid})
   }

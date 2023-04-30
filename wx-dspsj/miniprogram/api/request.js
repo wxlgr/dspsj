@@ -6,13 +6,12 @@ import {
 // 封装Promise request方法
 // 这里统一在relativeUrl前拼接上baseApiUrl
 function request(relativeUrl, method='get', data) {
-  const token = wx.getStorageSync('token')
   return new Promise((resolve, reject) => {
     wx.request({
       url: baseApiUrl + relativeUrl,
-      // 携带token 其中token已是'Bearer '开头
+      // 携带token 
       header: {
-        'Authorization': token
+        'Authorization': "Bearer "+wx.getStorageSync('token')
       },
       method,
       data,
@@ -32,7 +31,6 @@ function request(relativeUrl, method='get', data) {
     return request(url, itemMethod, data)
   }
 })
-
 
 export {
   request

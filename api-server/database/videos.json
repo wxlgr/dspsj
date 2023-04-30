@@ -1,0 +1,80 @@
+[{
+  "_id": {
+    "$oid": "644d32d37b64dafe78e9f600"
+  },
+  "title": "咕咕咕",
+  "author": {
+    "$oid": "644d1f7c5bbaf14a532c6a41"
+  },
+  "desc": "",
+  "coverPath": "static/uploads/photos/20230430/202304300234_44701551.jpeg",
+  "isPublic": true,
+  "videoPath": "static/uploads/videos/20230429/202304292308_94857451.mp4",
+  "star": 1,
+  "collect": 1,
+  "comments": [
+    {
+      "who": {
+        "_id": "644d7ec2d11f66be61fc0a8d",
+        "avatarPath": "static/uploads/avatars/20230430/202304300434_66263408.jpg",
+        "nickname": "admin"
+      },
+      "when": "2023-04-30 04:35:46",
+      "say": "666",
+      "_id": {
+        "$oid": "644d7fa2d11f66be61fc0add"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2023-04-29T15:08:03.832Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T20:35:46.572Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "644d6a9357ea828ee601f5c1"
+  },
+  "title": "图集",
+  "author": {
+    "$oid": "644d1f7c5bbaf14a532c6a41"
+  },
+  "desc": "添加文字",
+  "coverPath": "static/uploads/photos/20230430/202304300305_57946314.jpeg",
+  "isPublic": true,
+  "videoPath": "static/uploads/videos/20230430/202304300305_50827100.mp4",
+  "star": 0,
+  "collect": 0,
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-04-29T19:05:55.009Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T19:08:28.098Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "644d6ee157ea828ee601f707"
+  },
+  "title": "啦啦啦啦",
+  "author": {
+    "$oid": "644d6e9c57ea828ee601f6fe"
+  },
+  "desc": "",
+  "coverPath": "static/uploads/photos/20230430/202304300324_58498618.jpg",
+  "isPublic": true,
+  "videoPath": "static/uploads/videos/20230430/202304300324_29864293.mp4",
+  "star": 0,
+  "collect": 0,
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-04-29T19:24:17.267Z"
+  },
+  "updatedAt": {
+    "$date": "2023-04-29T19:24:17.267Z"
+  },
+  "__v": 0
+}]

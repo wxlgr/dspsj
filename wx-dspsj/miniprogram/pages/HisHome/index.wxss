@@ -1,0 +1,89 @@
+.container {
+  padding: 0;
+}
+.bg {
+  height: 22vh;
+  position: relative;
+}
+
+/*对比度 */
+.bg image {
+  filter: contrast(1.2);
+}
+
+.main {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80vh;
+  background-color: #fff;
+  border-radius: 10px 10px 0 0;
+  padding: 20rpx;
+}
+
+.avatar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -30%);
+}
+
+.avatar-img {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background-color: #fff;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.info{
+  margin-top: 80rpx;
+}
+
+
+/* 获赞、关注、粉丝数目 */
+.counts {
+  margin: 20rpx 0;
+  width: 80%;
+  display: flex;
+  justify-items: flex-start;
+  color: #555;
+  font-size: 12px;
+}
+
+/* 数字 */
+.counts strong {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.counts view,
+.counts navigator {
+  margin-right: 10px;
+}
+
+.list {
+  margin-top: 20rpx;
+  height: 100%;
+  height: 50vh;
+  background-color: #d8e6e7;
+}
+.list-item {
+  max-width: 100%;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vcover {
+  width: 400rpx;
+  height: 200rpx;
+}
+.vtitle,
+.title {
+  padding: 10rpx;
+}

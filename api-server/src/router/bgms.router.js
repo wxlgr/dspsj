@@ -91,7 +91,7 @@ bgmsRouter.get("/findByPage", async function (req, res) {
 
 bgmsRouter.post("/update", async function (req, res) {
   const bgmObj = req.body;
-  const _id = req.body._id;
+  const _id = bgmObj._id;
 
   // 返回修改之后的文档
   const bgm = await bgmsModel.findByIdAndUpdate(_id, bgmObj, {

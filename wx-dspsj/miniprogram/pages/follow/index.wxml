@@ -1,0 +1,94 @@
+<!--pages/bgm/index.wxml-->
+<view class="container">
+  <view class="tabs" bindtap="changeTab">
+    <view class="tab {{currentIndex===0?'active':''}}" data-index="{{0}}">关注</view>
+    <view class="tab {{currentIndex===1?'active':''}}" data-index="{{1}}">粉丝</view>
+  </view>
+  <swiper circular bindchange="swiperChange" current="{{currentIndex}}" class="swiper">
+    <!-- 关注列表 -->
+    <swiper-item>
+      <view class="top flex-between">
+        <view class="follow-count ">
+          我的关注 ({{follows.length}}人)
+        </view>
+        <view bindtap="toggleShowSelect" class="sort-by flex-between">
+          <text>{{sortRules[selectIndex]}}</text>
+          <i class="iconfont icon-sort_list"></i>
+          <!-- 下拉菜单 -->
+          <block wx:if="{{isShowSelect}}">
+            <view class="mask"></view>
+            <view class="select-list">
+              <block wx:for="{{sortRules}}" wx:key="index">
+                <view catchtap="changeSortOrder" data-index="{{index}}" class="sort-rule flex-between">
+                  {{item+(item=='综合'?'排序':'关注')}} <i wx:if="{{selectIndex===index}}" class="gou">√</i>
+                </view>
+              </block>
+            </view>
+          </block>
+
+        </view>
+      </view>
+      <scroll-view scroll-y enable-flex class="follow-list">
+        <block wx:for="{{follows}}" wx:key="id">
+          <view class="list-item flex-between">
+            <view class="left flex-between">
+              <view class="avatar">
+                <image src="{{item.avatarUrl}}" />
+              </view>
+              <view class="username single-line">{{item.username}}</view>
+            </view>
+            <view class="right flex-center">
+              <view data-index="{{index}}" bindtap="toggleFollow" class="btn {{item.meta.isFollowedByUser?'warn':''}}">{{item.meta.isFollowedByUser?'已关注':'关注'}}</view>
+            </view>
+          </view>
+        </block>
+      </scroll-view>
+    </swiper-item>
+    <!-- 粉丝列表 -->
+    <swiper-item>
+      <view class="top flex-between">
+        <view class="follow-count ">
+          我的粉丝 ({{fans.length}}人)
+        </view>
+        <view bindtap="toggleShowSelect" class="sort-by flex-between">
+          <text>{{sortRules[selectIndex]}}</text>
+          <i class="iconfont icon-sort_list"></i>
+          <!-- 下拉菜单 -->
+          <block wx:if="{{isShowSelect}}">
+            <view class="mask"></view>
+            <view class="select-list">
+              <view catchtap="changeSortOrder" data-index="0" class="sort-rule flex-between">
+                综合排序 <i wx:if="{{selectIndex===0}}" class="gou">√</i>
+              </view>
+              <view catchtap="changeSortOrder" data-index="1" class="sort-rule flex-between">
+                最近粉丝
+                <i wx:if="{{selectIndex===1}}" class="gou">√</i>
+              </view>
+              <view catchtap="changeSortOrder" data-index="2" class="sort-rule flex-between">
+                最先粉丝
+                <i wx:if="{{selectIndex===2}}" class="gou">√</i>
+              </view>
+            </view>
+          </block>
+
+        </view>
+      </view>
+      <scroll-view scroll-y enable-flex class="fans-list">
+        <block wx:for="{{fans}}" wx:key="id">
+          <view class="list-item flex-between">
+            <view class="left flex-between">
+              <view class="avatar">
+                <image src="{{item.avatarUrl}}" />
+              </view>
+              <view class="username single-line">{{item.username}}</view>
+            </view>
+            <view class="right flex-between ">
+              <view data-index="{{index}}" bindtap="removeFan" class="btn warn">移除</view>
+              <view data-index="{{index}}" bindtap="toggleFollow" class="btn {{item.meta.isFollowedByUser?'warn':''}}">{{item.meta.isFollowedByUser&&item.meta.isFansofUser?'已互关':'关注'}}</view>
+            </view>
+          </view>
+        </block>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
+</view>
