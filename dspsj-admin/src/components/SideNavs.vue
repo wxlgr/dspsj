@@ -12,6 +12,12 @@
                 </el-icon>
                 <span>首页</span>
             </el-menu-item>
+            <el-menu-item index="/overview">
+                <el-icon>
+                    <Histogram />
+                </el-icon>
+                <span>概览统计图表</span>
+            </el-menu-item>
             <el-menu-item index="/users">
                 <el-icon>
                     <UserFilled />
@@ -30,6 +36,26 @@
                 </el-icon>
                 <span>bgm管理</span>
             </el-menu-item>
+            <el-sub-menu index="/reports_feedbacks">
+                <template #title>
+                    <el-icon>
+                        <Promotion />
+                    </el-icon>
+                    <span>视频举报与反馈</span>
+                </template>
+                <el-menu-item index="/reports">
+                    <el-icon>
+                        <Message />
+                    </el-icon>
+                    <span>视频内容举报</span>
+                </el-menu-item>
+                <el-menu-item index="/feedbacks">
+                    <el-icon>
+                        <BellFilled />
+                    </el-icon>
+                    <span>视频播放反馈</span>
+                </el-menu-item>
+            </el-sub-menu>
 
 
         </el-menu>
@@ -45,7 +71,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useMenuStore } from "@/stores/menuStore.js";
@@ -108,11 +134,9 @@ watch(
         border: 0;
         padding: 0;
     }
-
     .el-menu-vertical {
         height: calc(100vh - 150px);
-        // border: 1px solid yellow;
-        overflow: hidden auto;
+
     }
 }
 
@@ -140,5 +164,4 @@ watch(
     display: flex;
     justify-content: center;
     align-items: center;
-}
-</style>
+}</style>

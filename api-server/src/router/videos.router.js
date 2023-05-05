@@ -147,16 +147,18 @@ videosRouter.post("/update", async (req, res) => {
 
 // 视频删除
 videosRouter.post("/delete", async (req, res) => {
-  // 视频id
-  let _id = req.body._id;
-
-  const video = await videosModel.findByIdAndDelete(_id);
-
-  res.send({
-    code: 0,
-    result: video,
-    msg: video ? "删除成功" : "视频不存在，删除失败",
-  });
+  try {
+    // 视频id
+    let _id = req.body._id;
+    const video = await videosModel.findByIdAndDelete(_id);
+    res.send({
+      code: 0,
+      result: video,
+      msg: video ? "删除成功" : "视频不存在，删除失败",
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // 获取用户的公开作品
@@ -288,7 +290,7 @@ videosRouter.post("/find", async function (req, res) {
 });
 
 // 获得视频总数
-videosRouter.get("/getVideosCount", async function (req, res) {
+videosRouter.get("/totalCount", async function (req, res) {
   const totalCount = await videosModel.count();
   res.send({
     code: 0,
@@ -296,7 +298,8 @@ videosRouter.get("/getVideosCount", async function (req, res) {
     msg: "查询成功",
   });
 });
-// video分页查询
+
+// video分页查询，所有公开视频
 videosRouter.get("/findByPage", async function (req, res) {
   try {
     let { pageIndex = 1, pageSize = 5 } = req.query;
@@ -305,7 +308,6 @@ videosRouter.get("/findByPage", async function (req, res) {
     pageIndex = +pageIndex;
     pageSize *= 1;
 
-    const totalCount = await videosModel.count();
     const list = await videosModel
       .find({
         isPublic: true,
@@ -319,20 +321,40 @@ videosRouter.get("/findByPage", async function (req, res) {
 
     res.send({
       code: 0,
-      result: {
-        // 总数
-        totalCount,
-        // 总页数
-        totalSize: Math.ceil(totalCount / pageSize),
-        // 当前返回列表项数目
-        listCount: list.length,
-        // 第几页
-        pageIndex,
-        // 每页显示条数
-        pageSize,
-        // 列表数据
-        list: list,
-      },
+      result: list,
+      msg: "查询成功",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.send({
+      code: 1,
+      msg: "未知错误！",
+      result: null,
+    });
+  }
+});
+// video分页查询,包括私有视频
+videosRouter.get("/findAllByPage", async function (req, res) {
+  try {
+    let { pageIndex = 1, pageSize = 5 } = req.query;
+
+    // 转为数字
+    pageIndex = +pageIndex;
+    pageSize *= 1;
+
+    const list = await videosModel
+      .find({
+      })
+      .skip((pageIndex - 1) * pageSize)
+      .limit(pageSize)
+      .sort({
+        createdAt: "desc",
+      })
+      .populate("author", "nickname avatarPath");
+
+    res.send({
+      code: 0,
+      result: list,
       msg: "查询成功",
     });
   } catch (error) {
@@ -345,8 +367,25 @@ videosRouter.get("/findByPage", async function (req, res) {
   }
 });
 
-// video修改
+// 标题和描述的模糊查询
+videosRouter.get("/search", async function (req, res) {
+  try {
+    const { searchText } = req.query;
+    const regex = new RegExp(searchText, "i");
+    const videos = await videosModel.find({
+      $or: [{ title: regex }, { desc: regex }],
+    }).populate('author','nickname avatarPath');
+    res.send({
+      code: 0,
+      result: videos,
+      msg: "模糊查询成功",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
+// video修改
 videosRouter.post("/update", async function (req, res) {
   try {
     const videoObj = req.body;
@@ -367,6 +406,36 @@ videosRouter.post("/update", async function (req, res) {
       res.send({
         code: 1,
         msg: "video不存在,修改失败",
+        result: null,
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.send({
+      code: 1,
+      msg: "未知错误！",
+      result: null,
+    });
+  }
+});
+
+// video禁止公开
+videosRouter.post("/toggleIsPublic", async function (req, res) {
+  try {
+    const vid = req.body.vid;
+    const video = await videosModel.findById(vid);
+    if (video) {
+      video.isPublic = !video.isPublic;
+      video.save();
+      res.send({
+        code: 0,
+        msg: video.isPublic?"视频已恢复公开":"视频禁止公开成功",
+        result: video,
+      });
+    } else {
+      res.send({
+        code: 1,
+        msg: "video不存在",
         result: null,
       });
     }

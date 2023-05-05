@@ -63,6 +63,7 @@ page {
 .title {
   flex: 1;
   padding: 10rpx;
+  text-decoration: underline;
 }
 
 .btns {

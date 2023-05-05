@@ -1,5 +1,6 @@
 import api from '../../api/index'
 import utils from '../../utils/chooseAndUploadPic'
+import md5 from 'md5'
 Page({
   data: {
     userInfo: {},
@@ -189,5 +190,37 @@ Page({
     wx.showToast({
       title: '生日修改成功',
     })
-  }
+  },
+   // 修改密码
+   async changePwd() {
+    const {
+      userInfo: user
+    } = this.data
+    let oldPwd = user.password
+    const r = await wx.showModal({
+      title: '修改密码',
+      editable: true,
+      placeholderText: "请输入新密码"
+    })
+    if (r.cancel) return;
+    let newPwd = r.content.trim()
+    if (!newPwd) {
+      return wx.showToast({
+        title: '新密码不能为空'
+      })
+    } else if (oldPwd === newPwd) {
+      return wx.showToast({
+        icon: 'none',
+        title: '新旧密码不能一样'
+      })
+    }
+    await api.updateUser({
+      _id: user._id,
+      password: md5(newPwd)
+    })
+    wx.showToast({
+      title: '密码修改成功'
+    })
+    this.getUserInfo()
+  },
 })

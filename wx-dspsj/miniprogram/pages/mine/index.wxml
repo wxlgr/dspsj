@@ -10,7 +10,7 @@
       <!-- <view class="uid single-line">_id：{{userInfo._id}}</view> -->
     </view>
     <view wx:else>
-      <button size="mini" type="primary" bindtap="goLogin">去登陆</button>
+     <navigator url="../login/index"> <button size="mini" type="primary" >去登陆</button></navigator>
     </view>
   </view>
 </view>

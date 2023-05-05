@@ -101,30 +101,32 @@ let singleFileUploads = [
  * 单文件上传
  */
 singleFileUploads.forEach((item) => {
-  uploadRouter.post(
-    item.url,
-    item.upload.single(item.field),
-    function (req, res, next) {
-      req.acceptsCharsets = "utf8";
-      res.charset = "utf8";
-      const file = req.file;
-
-      // 完整地址
-      const fUrl = linkUrls(baseUrl, file.destination, file.filename);
-      // 相对
-      const rPath = linkUrls(file.destination, file.filename);
-      res.send({
-        code: 0,
-        result: {
-          url: fUrl,
-          path: rPath,
-        },
-        msg: `${item.field} upload success`,
-      });
-    }
-  );
+  uploadRouter.post(item.url, function (req, res, next) {
+    const upload = item.upload.single("file");
+    upload(req, res, function (err) {
+      if (err) {
+        res.send({
+          code: 1,
+          msg: err.message,
+        });
+      } else {
+        const file = req.file;
+        // 完整地址
+        const fUrl = linkUrls(baseUrl, file.destination, file.filename);
+        // 相对
+        const rPath = linkUrls(file.destination, file.filename);
+        res.send({
+          code: 0,
+          result: {
+            url: fUrl,
+            path: rPath,
+          },
+          msg: `${item.field} upload success`,
+        });
+      }
+    });
+  });
 });
-
 //图册临时多照片上传
 
 let tempPhotosUpload = multer({
@@ -132,8 +134,8 @@ let tempPhotosUpload = multer({
 });
 uploadRouter.post(
   "/photos",
-  tempPhotosUpload.array("photos", 6),
-  function (req, res, next) {
+  tempPhotosUpload.array("file", 6),
+  function (req, res) {
     req.acceptsCharsets = "utf8";
     res.charset = "utf8";
     const files = req.files;
@@ -166,7 +168,7 @@ uploadRouter.post("/delete", async function (req, res) {
     res.send({
       code: 0,
       result,
-      msg: "delete success",
+      msg: "delete file in server success",
     });
   } catch (error) {
     console.log(error.message);

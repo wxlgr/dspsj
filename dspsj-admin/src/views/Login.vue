@@ -18,11 +18,11 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script  setup>
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { login } from "@/api/index";
+import api from "@/api/index";
 
 import md5 from "md5";
 // 图标
@@ -57,16 +57,19 @@ const submitLoginForm = async (formEl) => {
         username,
         password: md5(password),
       };
-      login(data).then((res) => {
+      api.login(data).then((data) => {
 
-        const { code, msg, result, token } = res.data;
-
+        const { code, msg, result, token } = data;
+        if(result.role!=='admin') {
+          return ElMessage["error"]('登陆失败，您不是管理员');
+        }
         ElMessage[code === 0 ? "success" : "error"](msg);
         if (code === 0) {
-
           loginStore.username = result.username
+          loginStore.nickname = result.nickname
           loginStore.token = token
-
+          loginStore.avatarPath = result.avatarPath
+          loginStore._id = result._id
           router.push({
             path: "/welcome",
           });
@@ -92,7 +95,7 @@ const loginRules = reactive({
     required: true,
     message: "请输入密码",
     trigger: "blur",
-  },
+  }
 });
 </script>
 

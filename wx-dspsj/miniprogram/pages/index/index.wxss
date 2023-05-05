@@ -200,7 +200,7 @@ video {
 .who {
   font-size: 32rpx;
   width: 120rpx;
-  background-color: red;
+  /* background-color: red; */
 }
 
 .time {

@@ -22,6 +22,14 @@ const routes = [
       },
       {
         meta: {
+          title: "概览统计",
+        },
+        path: "/overview",
+        name: "overview",
+        component: () => import("@/views/Overview.vue"),
+      },
+      {
+        meta: {
           title: "用户管理",
         },
         path: "/users",
@@ -43,6 +51,22 @@ const routes = [
         path: "/bgms",
         name: "bgms",
         component: () => import("@/views/Bgms.vue"),
+      },
+      {
+        meta: {
+          title: "视频内容举报",
+        },
+        path: "/reports",
+        name: "reports",
+        component: () => import("@/views/Reports.vue"),
+      },
+      {
+        meta: {
+          title: "视频播放反馈",
+        },
+        path: "/feedbacks",
+        name: "feedbacks",
+        component: () => import("@/views/Feedbacks.vue"),
       },
     ],
   },
@@ -71,8 +95,9 @@ const router = createRouter({
   routes,
 });
 
+
+// 路由守卫
 router.beforeEach((to, from, next) => {
-  const loginStore = useLoginStore();
   if (to.meta.requireAuth !== false) {
     // 需要登录
     const loginStore = useLoginStore();

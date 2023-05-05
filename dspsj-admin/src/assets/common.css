@@ -7,4 +7,4 @@ input,button,img{border: none}
 .active{color:#409EFF;}
 
 /* 解决表格溢出文字不省略问题 */
-tr p{overflow: hidden;text-overflow: ellipsis;}
+tr p,tr div{overflow: hidden;text-overflow: ellipsis;}

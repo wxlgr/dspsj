@@ -4,6 +4,9 @@ export const useLoginStore = defineStore("login", {
     return {
       token: "",
       username: "",
+      nickname:'',
+      avatarPath: "",
+      _id:''
     };
   },
   persist: {

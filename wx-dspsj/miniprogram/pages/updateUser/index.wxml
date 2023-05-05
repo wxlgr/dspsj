@@ -35,6 +35,11 @@
           <view class="arrow">></view>
         </view>
       </picker>
+      <view bindtap="changePwd" class="info-item flex-between">
+        <view class="label">密码</view>
+        <view class="value single-line">***</view>
+        <view class="arrow">></view>
+      </view>
 
 
     </view>

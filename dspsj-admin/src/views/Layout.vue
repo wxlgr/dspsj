@@ -17,7 +17,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import { useMenuStore } from "@/stores/menuStore.js";
 import SideNavs from "@/components/SideNavs.vue";
 import NavTop from "@/components/NavTop.vue";
@@ -40,6 +40,7 @@ const menuStore = useMenuStore()
 // 右侧整体
 .content-right {
   margin-left: 200px;
+  transition: all 0.3s ease-in;
 }
 
 // 主要容器
@@ -48,13 +49,12 @@ const menuStore = useMenuStore()
   // 减去nav-top
   height: calc(100vh - 50px);
   padding: 20px;
-
   // 页面容器
   .main-page {
     height: 100%;
     border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.25);
   }
 }
 </style>

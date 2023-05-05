@@ -135,7 +135,7 @@ Page({
     } = await api.uploadFile(tempBgm.path, "bgm")
     //  数据库添加
     const bgmAdded = await api.addBGM({
-      author: this.data.uid,
+      uid: this.data.uid,
       title: tempBgm.name,
       bgmPath: file.path
     })
@@ -195,23 +195,18 @@ Page({
       myBgms
     } = this.data
     const bgm = myBgms.splice(index, 1)[0]
+    console.log(bgm);
     // UI更新
     this.setData({
       myBgms
     })
     // 数据库删除
-    const {
-      result
-    } = await api.deleteBgm(bgm._id)
+    await api.deleteBgm(bgm._id)
     // 删除文件
-    const {
-      result: file
-    } = await api.deleteFile(bgm.bgmPath)
-    if (result && file) {
-      wx.showToast({
-        title: '删除成功',
-      })
-    }
+    await api.deleteFile(bgm.bgmPath)
+    wx.showToast({
+      title: '删除成功',
+    })
   },
 
   downLoadBgm(e) {

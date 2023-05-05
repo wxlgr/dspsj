@@ -14,8 +14,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/static", express.static("./static"));
 
 const apiRouters = require("./src/router");
-//挂载路由
-app.use("/api/v1", apiRouters);
 
 // 检验token
 const expressJWT = require("express-jwt");
@@ -29,7 +27,7 @@ app.use(
       requestProperty: "auth",
     })
     .unless({
-      path: ["/api/v1/users/login", "/api/v1/users/register"],
+      path: [/users\/login/, /users\/register/i, /upload\/.*/],
     })
 );
 
@@ -42,8 +40,11 @@ app.use(function (err, req, res, next) {
   }
 });
 
+//挂载路由
+app.use("/api/v1", apiRouters);
+
 // 其他 404
-app.use("*", (req, res) => {
+app.use("*", (req, res, next) => {
   res.status(404).json({ code: 404, result: null, msg: "404 not found" });
 });
 

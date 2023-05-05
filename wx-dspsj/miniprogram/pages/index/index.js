@@ -87,7 +87,7 @@ Page({
       pageIndex: pIndex,
       pageSize: 5
     })
-    const videos = result.list
+    const videos = result
     this.setData({
       totalCount: result.totalCount,
       totalSize: result.totalSize,

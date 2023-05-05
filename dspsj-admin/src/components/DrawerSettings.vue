@@ -1,6 +1,6 @@
 <template>
     <div class="settings-btn" @click="openDrawer = true">
-        <el-button class="btn" type="primary">
+        <el-button class="btn">
             <el-icon class="settings-icon">
                 <Setting />
             </el-icon></el-button>
@@ -14,12 +14,12 @@
     </el-drawer>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue';
 import { useSystemSettingsStore } from '@/stores/systemSettingsStore.js'
 
 const systemSettingsStore = useSystemSettingsStore()
-
+// 打开抽屉
 const openDrawer = ref(false)
 
 </script>
@@ -27,21 +27,25 @@ const openDrawer = ref(false)
 <style lang="less" scoped>
 .settings-btn {
     position: fixed;
-    right: -20px;
+    right: 0;
     top: 200px;
     z-index: 100;
-    transition: 0.25s;
+    transition: 0.3s;
     &:hover{
-        right: 0;
+        .btn{
+            padding-right:30px;
+        }
     }
+
     .btn{
-        padding-left: 0;
+        padding: 0;
+        background-color: #fff;
     }
 }
 
 
 .settings-icon {
     font-size: 30px;
-    color: #fff
+    color: #01847f;
 }
 </style>

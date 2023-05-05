@@ -13,35 +13,34 @@
       <el-button class="addBtn" @click="doSearch">查询</el-button>
       <el-button @click="resetTable">重置表格</el-button>
     </form>
-    <el-table class="user-table" border stripe :data="videos.videoList" max-height="420px" style="width: 100%">
-      <el-table-column prop="title" label="标题" width="100" show-overflow-tooltip />
-      <el-table-column prop="_id" label="id" width="100" show-overflow-tooltip />
-      <el-table-column prop="author.nickname" label="作者" width="80" show-overflow-tooltip />
-      <el-table-column prop="isPublic" label="公开" width="70" >
+    <el-table class="user-table" border stripe :data="reports.reportList" max-height="420px" style="width: 100%">
+      <el-table-column prop="video.title" label="视频标题" width="100" show-overflow-tooltip />
+      <el-table-column prop="reason.value" label="举报原因" width="100" show-overflow-tooltip />
+      <el-table-column prop="from.nickname" label="举报人" width="80" show-overflow-tooltip />
+      <el-table-column prop="active" label="状态" width="82">
         <template #default="scope">
-          <el-tag  :type="scope.row.isPublic?'success':'info'">{{ formatIsPublic(scope.row.isPublic) }}</el-tag>
+          <el-tag :type="scope.row.active ? 'success' : 'info'">{{ formatIsActive(scope.row.active) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="desc" label="描述" show-overflow-tooltip>
-        <template #default="scope">
-          <span>{{ scope.row.desc ? scope.row.desc : '暂无描述' }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column prop="createdAt" label="发布日期" width="150" show-overflow-tooltip
+      <el-table-column prop="createdAt" label="举报日期" width="180" show-overflow-tooltip
         :formatter="(row) => dateFormatter(row.createdAt)" />
-      <el-table-column prop="updatedAt" label="最近修改日期" width="150" show-overflow-tooltip
-        :formatter="(row) => dateFormatter(row.updatedAt)" />
+      <el-table-column prop="isPublic" label="公开" width="70">
+        <template #default="scope">
+          <el-tag :type="scope.row.video.isPublic ? 'success' : 'info'">{{ formatIsPublic(scope.row.video.isPublic) }}</el-tag>
+        </template>
+      </el-table-column>
+      
       <el-table-column prop="coverPath" label="视频封面" width="130">
         <template #default="scope">
-          <el-image style="width: 100px;height: 60px;" :src="coverUrl(scope.row.coverPath)"></el-image>
+          <el-image style="width: 100px;height: 60px;" :src="formatUrl(scope.row.video.coverPath)"></el-image>
         </template>
       </el-table-column>
-      <el-table-column prop="videoPath" label="视频链接" show-overflow-tooltip
-        :formatter="(row) => videoUrlFormatter(row.videoPath)" />
+      <el-table-column prop="reportPath" label="视频链接" show-overflow-tooltip
+        :formatter="(row) => formatUrl(row.video.videoPath)" />
       <el-table-column label="操作" width="180">
         <template #default="scope">
-          <el-popconfirm v-if="scope.row.isPublic" title="确定禁止公开?" @confirm="handleToggleISPublic(scope.$index, scope.row)">
+          <el-popconfirm v-if="scope.row.isPublic" title="确定禁止公开?"
+            @confirm="handleToggleISPublic(scope.$index, scope.row)">
             <template #reference>
               <el-button size="small" type="warning">禁止公开</el-button>
             </template>
@@ -62,7 +61,7 @@
 
     <!-- 分页 -->
     <el-pagination class="pagination" layout="total, sizes, prev, pager, next, jumper"
-      v-model:current-page="page.pageIndex" v-model:page-size="page.pageSize" :total="videos.totalCount"
+      v-model:current-page="page.pageIndex" v-model:page-size="page.pageSize" :total="reports.totalCount"
       :page-sizes="[2, 5, 10]" @current-change="handleCurrentChange" @size-change="handlePageSizeChange" />
   </div>
 </template>
@@ -74,21 +73,24 @@ import { reactive, onMounted, ref } from 'vue'
 import config from '../config/index'
 import { ElMessage } from 'element-plus';
 
-
-const videoUrlFormatter = (videoPath) => {
-  return config.baseUrl + videoPath
-}
-const dateFormatter = (time) => {
-  return formatDate(time)
+const formatUrl = (path) => {
+  return path ? config.baseUrl + path : ''
 }
 const formatIsPublic = (flag) => {
   return flag ? '公开' : '私密'
 }
+const formatIsActive = (flag) => {
+  return flag ? '待处理' : '已处理'
+}
+
+const dateFormatter = (time) => {
+  return formatDate(time)
+}
 
 const searchText = ref('')
 
-const videos = reactive({
-  videoList: [],
+const reports = reactive({
+  reportList: [],
   totalCount: 0,
 })
 
@@ -98,38 +100,36 @@ const page = reactive({
 })
 
 // 根据当前页，每页条数请求数据
-const getVideosByPage = async (index) => {
-  const { result: list } = await api.findVideosListByPage(index || page.pageIndex, page.pageSize)
+const getReportsByPage = async (index) => {
+  const { result: list } = await api.findReportsByPage(index || page.pageIndex, page.pageSize)
   console.log(list)
-  videos.videoList = list
+  reports.reportList = list
 
 }
 // 根据当前页，每页条数请求数据
-const getVideosTotalCount = async (index) => {
-  const { result: total } = await api.getVideosTotalCount()
-  videos.totalCount = total
+const getReportsTotalCount = async (index) => {
+  const { result: total } = await api.getReportsTotalCount()
+  reports.totalCount = total
 }
 onMounted(async () => {
   try {
-    getVideosTotalCount()
-    getVideosByPage()
+    getReportsTotalCount()
+    getReportsByPage()
   } catch (error) {
     console.log(error)
   }
 })
 
-const coverUrl = (coverPath) => {
-  return coverPath ? config.baseUrl + coverPath : ''
-}
+
 
 
 // 禁止公开/恢复公开
 const handleToggleISPublic = async (index, row) => {
   try {
-    let vid = row._id
-    const { code, msg } = await api.toggleVideoIsPublic(vid)
-    ElMessage[code == 0 ? 'success' : 'error'](msg)
-    getVideosByPage()
+    // let vid = row._id
+    // const { code, msg } = await api.toggleVideoIsPublic(vid)
+    // ElMessage[code == 0 ? 'success' : 'error'](msg)
+    // getReportsByPage()
   } catch (error) {
     console.log(error)
   }
@@ -138,8 +138,8 @@ const handleToggleISPublic = async (index, row) => {
 // 删除视频
 const handleDelete = async (index, row) => {
   try {
-    let uid = row._id
-    ElMessage.warning('暂不支持视频删除')
+    // let uid = row._id
+    // ElMessage.warning('暂不支持视频删除')
   } catch (error) {
     console.log(error)
 
@@ -147,11 +147,11 @@ const handleDelete = async (index, row) => {
 }
 // 当前页面改变
 const handleCurrentChange = (pageIndex) => {
-  getVideosByPage()
+  getReportsByPage()
 }
 // 每页显示条数改变
 const handlePageSizeChange = (pageSize) => {
-  getVideosByPage()
+  getReportsByPage()
 }
 // 查询
 const doSearch = async () => {
@@ -159,10 +159,10 @@ const doSearch = async () => {
   if (!searchText.value) {
     return ElMessage.warning("搜索条件不能为空")
   }
-  const { result } = await api.searchVideos(searchText.value)
-  videos.videoList = result
+  const { result } = await api.searchReports(searchText.value)
+  reports.reportList = result
   console.log(result)
-  
+
   ElMessage.success(`查询到${result.length}条结果`)
 
 }
@@ -171,7 +171,7 @@ const resetTable = () => {
   searchText.value = ''
   page.pageIndex = 1
   page.pageSize = 5
-  getVideosByPage(1)
+  getReportsByPage(1)
 }
 </script>
 

@@ -1,11 +1,13 @@
 const userRouter = new require("express").Router();
 const { usersModel, videosModel } = require("../mongoose/models/index");
 const jwt = require("jsonwebtoken");
-const { removeFile } = require("../utils");
+
+// 只查这些属性
+const userBaiscSelect = "username nickname avatarPath bgPath gender birthday";
 
 // 注册
 userRouter.post("/register", async function (req, res) {
-  const { username } = req.body;
+  const { username, nickname } = req.body;
   let hasData = await usersModel.findOne({ username });
 
   // 检测用户名是否已存在
@@ -19,13 +21,42 @@ userRouter.post("/register", async function (req, res) {
   // 初次注册
   const user = await usersModel.create({
     ...req.body,
-    nickname: username,
+    nickname: nickname || username,
   });
   res.send({
     code: 0,
     result: user,
     msg: "注册成功",
   });
+});
+
+// 删除用户
+userRouter.post("/remove", async function (req, res) {
+  try {
+    const { uid } = req.body;
+    const user = await usersModel.findByIdAndDelete(uid,{
+      returnDocument:'before'
+    });
+    if (user) {
+      res.send({
+        code: 0,
+        result: user,
+        msg: "删除成功",
+      });
+    } else {
+      res.send({
+        code: 1,
+        result: null,
+        msg: "删除失败",
+      });
+    }
+  } catch (err) {
+    res.send({
+      code: 1,
+      result: null,
+      msg: "删除失败",
+    });
+  }
 });
 
 // 登录
@@ -91,7 +122,9 @@ userRouter.get("/hisInfo/:uid", async function (req, res) {
     const uid = req.params.uid;
     const user = await usersModel
       .findById(uid)
-      .select("username nickname gender avatarPath bgPath birthday star fansCount followsCount")
+      .select(
+        "username nickname gender avatarPath bgPath birthday star fansCount followsCount"
+      );
     res.send({
       code: 0,
       result: user,
@@ -153,49 +186,6 @@ userRouter.post("/delete", async (req, res) => {
       code: 1,
       result: null,
       msg: error.message || "未知错误",
-    });
-  }
-});
-
-// 分页查询
-userRouter.get("/findByPage", async function (req, res) {
-  try {
-    let { pageIndex = 1, pageSize = 5 } = req.query;
-
-    // 转为数字
-    pageIndex = +pageIndex;
-    pageSize *= 1;
-
-    const totalCount = await usersModel.count();
-    const list = await usersModel
-      .find()
-      .skip((pageIndex - 1) * pageSize)
-      .limit(pageSize);
-
-    res.send({
-      code: 0,
-      result: {
-        // 总数
-        totalCount,
-        // 总页数
-        totolSize: Math.ceil(totalCount / pageSize),
-        // 当前返回列表项数目
-        listCount: list.length,
-        // 第几页
-        pageIndex,
-        // 每页显示条数
-        pageSize,
-        // 列表数据
-        list: list,
-      },
-      msg: "查询成功",
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.send({
-      code: 1,
-      msg: "未知错误！",
-      result: null,
     });
   }
 });
@@ -461,4 +451,71 @@ userRouter.post("/unCollectVideo", async function (req, res) {
     collects: user.collects,
   });
 });
+
+// 获取用户总数
+userRouter.get("/totalCount", async function (req, res) {
+  const totalCount = await usersModel.count();
+  res.send({
+    code: 0,
+    result: totalCount,
+    msg: "获取用户总数成功",
+  });
+});
+// 分页查询
+userRouter.get("/findByPage", async function (req, res) {
+  try {
+    let { pageIndex = 1, pageSize = 2 } = req.query;
+
+    // 转为数字
+    pageIndex = +pageIndex;
+    pageSize *= 1;
+
+    const totalCount = await usersModel.count();
+    const list = await usersModel
+      .find()
+      .select("username nickname avatarPath bgPath gender birthday")
+      .skip((pageIndex - 1) * pageSize)
+      .limit(pageSize)
+      .sort({
+        createdAt: -1,
+      });
+    res.send({
+      code: 0,
+      result: list,
+      msg: "查询成功",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.send({
+      code: 1,
+      msg: "未知错误！",
+      result: null,
+    });
+  }
+});
+
+// 用户名和昵称的模糊查询
+userRouter.get("/search", async function (req, res) {
+  try {
+    const { searchText } = req.query;
+    const regex = new RegExp(searchText, "i");
+    const users = await usersModel
+      .find({
+        $or: [
+          { username: regex },
+          { nickname: regex },
+          // 其他需要查询的字段
+        ],
+      })
+      .select(userBaiscSelect);
+    res.send({
+      code: 0,
+      result: users,
+      msg: "模糊查询成功",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = userRouter;

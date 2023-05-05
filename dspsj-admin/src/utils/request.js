@@ -3,6 +3,7 @@ import qs from 'qs';
 import { ElMessage } from "element-plus";
  
 import config from '../config/index'
+import {useLoginStore} from '@/stores/loginStore'
 const errorHandle = (status, info) => {
     switch (status) {
         case 400: ElMessage.error("语义有误");
@@ -22,9 +23,15 @@ const errorHandle = (status, info) => {
     }
 }
 
+const loginStore = useLoginStore()
+
+// 添加请求头
 const instance = axios.create({
     timeout: 5000,
-    baseURL:config.baseApi
+    baseURL:config.baseApi,
+    headers:{
+        Authorization:'Bearer ' +loginStore.token
+    }
 })
 
 //请求拦截
@@ -37,8 +44,10 @@ instance.interceptors.request.use(
 
 //响应拦截
 instance.interceptors.response.use(
+
+    // 成功直接返回data
     response => response.status === 200 ?
-        Promise.resolve(response) : Promise.reject(response),
+        Promise.resolve(response.data) : Promise.reject(response),
     error => {
         const { response } = error
         errorHandle(response.status, response.info)

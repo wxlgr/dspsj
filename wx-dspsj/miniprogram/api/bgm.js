@@ -16,8 +16,8 @@ const bgmsApi = {
   updateBgm(bgmObj) {
     return request.post('/bgms/update',bgmObj)
   },
-  deleteBgm(gid) {
-    return request.post("/bgms/delete",{gid})
+  deleteBgm(id) {
+    return request.post("/bgms/delete",{id})
   }
 }
 export {

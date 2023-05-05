@@ -2,7 +2,7 @@
     <div class="nav-top">
         <div class="nav-top-left">
             <div class="toggle-side-menu">
-                <div class="collapseBtn" @click="menuStore.isCollapse=!menuStore.isCollapse">
+                <div class="collapseBtn" @click="menuStore.isCollapse = !menuStore.isCollapse">
                     <el-icon v-show="menuStore.isCollapse">
                         <Expand />
                     </el-icon>
@@ -16,9 +16,12 @@
         </div>
         <div class="nav-top-right">
             <div class="user">
+                <el-avatar style="margin-right: 10px;width: 40px;height: 40px;" fit="cover"
+                    :src="avatarUrl(loginStore.avatarPath) || avatarDefault">
+                    {{ loginStore.nickname }}</el-avatar>
                 <el-dropdown @command="handleDropDownCommond">
                     <span class="el-dropdown-link">
-                        {{ loginStore.username }}
+                        {{ loginStore.nickname }}
                         <el-icon class="el-icon--right">
                             <arrow-down />
                         </el-icon>
@@ -34,16 +37,21 @@
     </div>
 </template>
 
-<script setup lang="ts">
-import { ref, watch } from 'vue'
+<script setup >
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { useLoginStore } from '../stores/loginStore.js'
 import { useMenuStore } from '../stores/menuStore.js'
 import Breadcrumb from "./Breadcrumb.vue";
+
+import config from '@/config/index';
 const router = useRouter()
 const loginStore = useLoginStore()
 const menuStore = useMenuStore()
+
+const avatarUrl = (avatarPath) => {
+    return avatarPath ? config.baseUrl + avatarPath : ''
+}
 // 处理下拉菜单
 function handleDropDownCommond(command) {
     if (command === "logout") {
@@ -60,7 +68,7 @@ function handleDropDownCommond(command) {
                 message: "已退出登录",
             });
             router.push("/login");
-        }).catch(() => {});
+        }).catch(() => { });
 
     }
 }
@@ -76,13 +84,20 @@ function handleDropDownCommond(command) {
     padding: 0 20px;
 }
 
-.collapseBtn,.nav-top-left{
+.collapseBtn,
+.nav-top-left {
     display: flex;
     align-items: center;
-   
+
 }
-.collapseBtn{
+
+.collapseBtn {
     margin-right: 10px;
+}
+
+.user{
+    display: flex;
+    align-items: center;
 }
 
 .el-dropdown-link {

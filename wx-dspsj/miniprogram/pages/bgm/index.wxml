@@ -7,6 +7,7 @@
   <swiper circular bindchange="bgmSwiperChange" current="{{currentIndex}}" class="bgm-list">
     <!-- bgm列表 -->
     <swiper-item>
+      <view wx:if="{{bgmList.length===0}}" class="empty">空空如也</view>
       <view bindtap="chooseBgm" wx:for="{{bgmList}}" wx:key="title" class="bgm flex-between">
         <view data-index="{{index}}" bindtap="{{options.chosenAndBack?'':'goPlayBgm'}}" class="title single-line">{{item.title}}</view>
         <view class="btns">

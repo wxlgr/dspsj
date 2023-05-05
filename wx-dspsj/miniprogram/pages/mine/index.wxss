@@ -110,9 +110,10 @@ page {
 .vtitle,
 .title {
   padding: 10rpx;
+  text-decoration: none;
 }
 .btns{
-  min-width: 40%;
+  min-width: 42%;
 }
 
 .opt {

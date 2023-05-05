@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<script lang="ts"  setup>
+<script  setup>
 import notfoundImg from '../assets/404.gif'
 </script>
 

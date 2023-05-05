@@ -1,11 +1,13 @@
 const bgmsRouter = new require("express").Router();
-const { bgmsModel } = require("../mongoose/models/index");
+const { isObjectIdOrHexString } = require("../mongoose/db");
+const { bgmsModel, usersModel } = require("../mongoose/models/index");
 
 // bgm新增
 bgmsRouter.post("/add", async function (req, res) {
-  const { author = "", bgmPath, title = "" } = req.body;
+  const { uid, bgmPath, title } = req.body;
+
   const bgm = await bgmsModel.create({
-    author,
+    author: uid,
     bgmPath,
     title,
   });
@@ -20,7 +22,10 @@ bgmsRouter.post("/add", async function (req, res) {
 bgmsRouter.get("/findAll", async function (req, res) {
   const bgms = await bgmsModel
     .find()
-    .populate("author", ["username", "nickname"]);
+    .populate("author", ["username", "nickname", "avatarPath"])
+    .sort({
+      updatedAt: -1,
+    });
   res.send({
     code: 0,
     result: bgms,
@@ -37,7 +42,10 @@ bgmsRouter.get("/findUserBgms/:uid", async function (req, res) {
       .find({
         author: uid,
       })
-      .populate("author", "username");
+      .populate("author", "username nickname avatarPath")
+      .sort({
+        updatedAt: -1,
+      });
     res.send({
       code: 0,
       result: videos,
@@ -53,6 +61,15 @@ bgmsRouter.get("/findUserBgms/:uid", async function (req, res) {
   }
 });
 
+// 获得bgm总数
+bgmsRouter.get("/totalCount", async function (req, res) {
+  const totalCount = await bgmsModel.count();
+  res.send({
+    code: 0,
+    result: totalCount,
+    msg: "查询成功",
+  });
+});
 // bgm分页查询
 bgmsRouter.get("/findByPage", async function (req, res) {
   let { pageIndex = 1, pageSize = 5 } = req.query;
@@ -61,30 +78,39 @@ bgmsRouter.get("/findByPage", async function (req, res) {
   pageIndex = +pageIndex;
   pageSize *= 1;
 
-  const totalCount = await bgmsModel.count();
   const list = await bgmsModel
     .find()
     .skip((pageIndex - 1) * pageSize)
-    .limit(pageSize);
+    .limit(pageSize)
+    .populate("author", "nickname avatarPath")
+    .sort({
+      createdAt: -1,
+    });
 
   res.send({
     code: 0,
-    result: {
-      // 总数
-      totalCount,
-      // 总页数
-      totolSize: Math.ceil(totalCount / pageSize),
-      // 当前返回列表项数目
-      listCount: list.length,
-      // 第几页
-      pageIndex,
-      // 每页显示条数
-      pageSize,
-      // 列表数据
-      list: list,
-    },
+    result: list,
     msg: "查询成功",
   });
+});
+// 标题模糊查询
+bgmsRouter.get("/search", async function (req, res) {
+  try {
+    const { searchText } = req.query;
+    const regex = new RegExp(searchText, "i");
+    const bgms = await bgmsModel
+      .find({
+        $or: [{ title: regex }],
+      })
+      .populate("author", "nickname avatarPath");
+    res.send({
+      code: 0,
+      result: bgms,
+      msg: "模糊查询成功",
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // bgm修改
@@ -116,8 +142,8 @@ bgmsRouter.post("/update", async function (req, res) {
 // 删除bgm
 bgmsRouter.post("/delete", async (req, res) => {
   // bgmid
-  const gid = req.body.gid;
-  const bgm = await bgmsModel.findByIdAndDelete(gid);
+  const id = req.body.id;
+  const bgm = await bgmsModel.findByIdAndDelete(id);
   res.send({
     code: 0,
     result: bgm,
