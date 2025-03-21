@@ -1,3 +1,2 @@
-```js
- pnpm add vue-router element-plus axios
- pnpm install -D unplugin-vue-components unplugin-auto-import
+1. 安装依赖 pnpm i
+2. 

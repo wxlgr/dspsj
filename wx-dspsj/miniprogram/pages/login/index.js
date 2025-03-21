@@ -36,9 +36,13 @@ Page({
     const {
       isLogin
     } = this.data
+
+    
     let obj = {
       username,
-      password: md5(password)
+      password: md5(password),
+      // 用户名是admin，则默认为管理员，可以登录web-admin后台
+      role:username ==='admin'?'admin':'user'
     }
     // 请求后端登陆获注册
     if (isLogin) {
